@@ -1,7 +1,4 @@
-﻿// Beeldverwerking assignment 2
-// Mike Knoop (5853915)
-// Gideon Ogilvie (5936373)
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -18,7 +15,7 @@ namespace INFOIBV
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new INFOIBV());
+            Application.Run(new INFOIBV());
         }
     }
 }
