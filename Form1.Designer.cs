@@ -128,6 +128,7 @@
             "Edge Detection",
             "Opening",
             "Closing",
+            "Line Detection",
             "Region Detection",
             "Object Detection"});
             this.comboBoxTask.Location = new System.Drawing.Point(428, 13);

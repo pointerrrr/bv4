@@ -82,6 +82,7 @@ namespace INFOIBV
                 case 2:
                     // Edge Detection
                     Image = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
+                    Image = InvertImage(Image);
                     break;
                 case 3:
                     // Opening (erosion -> dilation)
@@ -98,10 +99,14 @@ namespace INFOIBV
                     Image = Erode(dilate, kernel);
                     break;
                 case 5:
-                    // Region Detection
+                    // Line Detection
 
                     break;
                 case 6:
+                    // Region Detection
+                    Image = RegionDetection(Image);
+                    break;
+                case 7:
                     // Object Detection
 
                     break;
@@ -120,6 +125,21 @@ namespace INFOIBV
             
             pictureBox2.Image = (Image)OutputImage;                         // Display output image
             progressBar.Visible = false;                                    // Hide progress bar
+        }
+
+        private Color[,] InvertImage(Color[,] InputImage)
+        {
+            var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
+
+            for(int i = 0; i < InputImage.GetLength(0); i++)
+            {
+                for (int j = 0; j < InputImage.GetLength(1); j++)
+                {
+                    var startColor = InputImage[i, j];
+                    res[i, j] = Color.FromArgb(255 - startColor.R, 255 - startColor.G, 255 - startColor.B);
+                }
+            }
+            return res;
         }
 
         private Color[,] ApplyThresholding(Color[,] InputImage, int threshholdValue, int mt = 0)
@@ -285,8 +305,6 @@ namespace INFOIBV
             }
             return res;
         }
-
-
 
         private Color[,] ApplyEdgeDetection(Color[,] InputImage, double[,] xKernel, double[,] yKernel, double scalar, int mt = 0)
         {
@@ -523,6 +541,11 @@ namespace INFOIBV
                 }
             }
             return res;
+        }
+
+        private Color[,] RegionDetection(Color[,] image)
+        {
+            throw new NotImplementedException();
         }
 
         private void saveButton_Click(object sender, EventArgs e)
