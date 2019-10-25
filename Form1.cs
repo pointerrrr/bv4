@@ -104,7 +104,10 @@ namespace INFOIBV
                     break;
                 case 6:
                     // Region Detection
-                    Image = RegionDetection(Image);
+                    Image = contrastAdjustment(Image);
+                    var binaryImage = ApplyThresholding(Image, 200);
+                    var edgeImage = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
+                    var regions = RegionDetection(binaryImage, edgeImage);
                     break;
                 case 7:
                     // Object Detection
@@ -543,9 +546,36 @@ namespace INFOIBV
             return res;
         }
 
-        private Color[,] RegionDetection(Color[,] image)
+        private int[,] RegionDetection(Color[,] BinaryImage, Color[,] EdgeImage)
         {
-            throw new NotImplementedException();
+            var res = new int[BinaryImage.GetLength(0), BinaryImage.GetLength(1)];
+            int counter = 1;
+            
+            for(int  y = 0; y < BinaryImage.GetLength(0); y++)
+            {
+                for(int x = 0; x < BinaryImage.GetLength(1); x++)
+                {
+                    if(BinaryImage[x,y].R == 0)
+                    {
+                        int hasNeighbor = 0;
+                        for(int i = -1; i < 2; i++)
+                        {
+                            for(int j = -1; j < 2; j++)
+                            {
+                                if(x + i >= 0 && x + i < BinaryImage.GetLength(0) && y + j >= 0 && y + j < BinaryImage.GetLength(1))
+                                {
+                                    if(res[x+i, y+j] != 0)
+                                    {
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return res;
         }
 
         private void saveButton_Click(object sender, EventArgs e)
