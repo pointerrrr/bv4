@@ -38,8 +38,13 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.comboBoxTask = new System.Windows.Forms.ComboBox();
+            this.numericUpDownThreshold = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.numericUpDownEdgeThreshold = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownEdgeThreshold)).BeginInit();
             this.SuspendLayout();
             // 
             // LoadImageButton
@@ -68,7 +73,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(13, 45);
+            this.pictureBox1.Location = new System.Drawing.Point(13, 298);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(512, 512);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -102,7 +107,7 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Location = new System.Drawing.Point(531, 45);
+            this.pictureBox2.Location = new System.Drawing.Point(531, 298);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(512, 512);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -130,17 +135,54 @@
             "Closing",
             "Line Detection",
             "Region Detection",
-            "Object Detection"});
+            "Object Detection",
+            "Edge sharpening"});
             this.comboBoxTask.Location = new System.Drawing.Point(428, 13);
             this.comboBoxTask.Name = "comboBoxTask";
             this.comboBoxTask.Size = new System.Drawing.Size(121, 21);
             this.comboBoxTask.TabIndex = 7;
             // 
+            // numericUpDownThreshold
+            // 
+            this.numericUpDownThreshold.Location = new System.Drawing.Point(948, 41);
+            this.numericUpDownThreshold.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numericUpDownThreshold.Name = "numericUpDownThreshold";
+            this.numericUpDownThreshold.Size = new System.Drawing.Size(95, 20);
+            this.numericUpDownThreshold.TabIndex = 8;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(855, 43);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(86, 13);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Image Threshold";
+            // 
+            // numericUpDownEdgeThreshold
+            // 
+            this.numericUpDownEdgeThreshold.Location = new System.Drawing.Point(729, 40);
+            this.numericUpDownEdgeThreshold.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numericUpDownEdgeThreshold.Name = "numericUpDownEdgeThreshold";
+            this.numericUpDownEdgeThreshold.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDownEdgeThreshold.TabIndex = 10;
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1052, 576);
+            this.ClientSize = new System.Drawing.Size(1052, 810);
+            this.Controls.Add(this.numericUpDownEdgeThreshold);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.numericUpDownThreshold);
             this.Controls.Add(this.comboBoxTask);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.pictureBox2);
@@ -155,6 +197,8 @@
             this.Text = "INFOIBV";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownEdgeThreshold)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -172,6 +216,9 @@
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.ComboBox comboBoxTask;
+        private System.Windows.Forms.NumericUpDown numericUpDownThreshold;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown numericUpDownEdgeThreshold;
     }
 }
 

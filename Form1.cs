@@ -23,6 +23,8 @@ namespace INFOIBV
         readonly double prewittScalar = 1d / 6;
         ////////////////////////////////////////////////////////////////////////////
 
+        int maxRegions;
+
         public INFOIBV()
         {
             InitializeComponent();
@@ -37,11 +39,11 @@ namespace INFOIBV
                 imageFileName.Text = file;                                  // Show file name
                 if (InputImage != null) InputImage.Dispose();               // Reset image
                 InputImage = new Bitmap(file);                              // Create new Bitmap from file
-                if (InputImage.Size.Height <= 0 || InputImage.Size.Width <= 0 ||
-                    InputImage.Size.Height > 512 || InputImage.Size.Width > 512) // Dimension check
-                    MessageBox.Show("Error in image dimensions (have to be > 0 and <= 512)");
-                else
-                    pictureBox1.Image = (Image) InputImage;                 // Display input image
+                //if (InputImage.Size.Height <= 0 || InputImage.Size.Width <= 0 ||
+                //    InputImage.Size.Height > 512 || InputImage.Size.Width > 512) // Dimension check
+                //    MessageBox.Show("Error in image dimensions (have to be > 0 and <= 512)");
+                //else
+                pictureBox1.Image = (Image) InputImage;                 // Display input image
             }
         }
 
@@ -72,7 +74,7 @@ namespace INFOIBV
             {
                 case 0:
                     // Thresholding
-                    Image = ApplyThresholding(Image, 200);
+                    Image = ApplyThresholding(Image, (int)numericUpDownThreshold.Value);
                     break;
                 case 1:
                     // Contrast Boost
@@ -105,13 +107,24 @@ namespace INFOIBV
                 case 6:
                     // Region Detection
                     Image = contrastAdjustment(Image);
-                    var binaryImage = ApplyThresholding(Image, 200);
+                    var binaryImage = ApplyThresholding(Image, (int)numericUpDownThreshold.Value);
+                    binaryImage = InvertImage(binaryImage);
                     var edgeImage = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
+                    double[,] kernel3 = CreateGaussianKernel(3, (double)2);
+                    var zooi2 = ApplyLinearFilter(edgeImage, kernel3);
+                    edgeImage = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
                     var regions = RegionDetection(binaryImage, edgeImage);
+                    drawRegions(Image, regions);
                     break;
                 case 7:
                     // Object Detection
 
+                    break;
+                case 8:
+                    //edge sharpening
+                    double[,] kernel2 = CreateGaussianKernel(3, (double)2); 
+                    var zooi = ApplyLinearFilter(Image, kernel2);
+                    Image = ApplyEdgeSharpening(Image, zooi, (double)3);
                     break;
                 default:
                     return;
@@ -128,6 +141,93 @@ namespace INFOIBV
             
             pictureBox2.Image = (Image)OutputImage;                         // Display output image
             progressBar.Visible = false;                                    // Hide progress bar
+        }
+
+        private Color[,] ApplyLinearFilter( Color[,] InputImage, double[,] kernel, int mt = 0)
+        {
+            var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
+            int sqr = (int)Math.Sqrt(1);
+            int fromX = (mt % sqr) * InputImage.GetLength(0) / sqr;
+            int toX = ((mt % sqr) + 1) * InputImage.GetLength(0) / sqr;
+            int fromY = (int)(mt / sqr) * InputImage.GetLength(1) / sqr;
+            int toY = ((int)(mt / sqr) + 1) * InputImage.GetLength(1) / sqr;
+
+            //==========================================================================================
+            // example: create a negative image
+            for (int x = fromX; x < toX; x++)
+            {
+                for (int y = fromY; y < toY; y++)
+                {
+                    ExactColor updatedColor = new ExactColor(0, 0, 0);
+                    double missed = 0; // for compensating pixels outside of the image
+                    for (int i = 0; i < kernel.GetLength(0); i++)
+                        for (int j = 0; j < kernel.GetLength(1); j++)
+                        {
+                            int xCoord = x + i - (kernel.GetLength(0) - 1) / 2;
+                            int yCoord = y + j - (kernel.GetLength(1) - 1) / 2;
+                            if (xCoord < 0 || xCoord >= InputImage.GetLength(0) || yCoord < 0 || yCoord >= InputImage.GetLength(1))
+                            {
+                                missed += kernel[i, j];
+                                continue;
+                            }
+
+                            Color pixelColor = InputImage[xCoord, yCoord];
+                            updatedColor = new ExactColor(updatedColor.R + pixelColor.R * kernel[i, j], updatedColor.G + pixelColor.G * kernel[i, j], updatedColor.B + pixelColor.B * kernel[i, j]);
+                        }
+
+
+                    res[x, y] = Color.FromArgb((int)(updatedColor.R * (1 / (1 - missed))), (int)(updatedColor.G * (1 / (1 - missed))), (int)(updatedColor.B * (1 / (1 - missed))));                             // Set the new pixel color at coordinate (x,y)                           // Increment progress bar
+                }
+            }
+            return res;
+        }
+
+        public static double[,] CreateGaussianKernel(int dimensionSize, double standardDeviation)
+        {
+            double[,] kernel = new double[dimensionSize, dimensionSize];
+            double sum = 0;
+            int offset = (dimensionSize - 1) / 2;
+            double distance;
+            for (int xRaw = 0; xRaw < dimensionSize; xRaw++)
+                for (int yRaw = 0; yRaw < dimensionSize; yRaw++)
+                {
+                    int x = xRaw - offset;
+                    int y = yRaw - offset;
+                    distance = ((x * x) + (y * y)) / (2 * standardDeviation * standardDeviation);
+                    double value = 1d / (2 * Math.PI * standardDeviation * standardDeviation) * Math.Exp(-distance);
+                    kernel[x + offset, y + offset] = value;
+                    sum += value;
+                }
+
+            // normalize the matrix to have a sum of 1
+            for (int x = 0; x < dimensionSize; x++)
+            {
+                for (int y = 0; y < dimensionSize; y++)
+                {
+                    kernel[x, y] = kernel[x, y] / sum;
+                }
+            }
+            return kernel;
+        }
+
+        private void drawRegions(Color[,] image, int[,] regions)
+        {
+            Random rnd = new Random(1337);
+            Color[] colors = new Color[maxRegions];
+            for(int i = 0; i < maxRegions; i++)
+            {
+                colors[i] = Color.FromArgb(rnd.Next(256),rnd.Next(256), rnd.Next(256));
+            }
+            for(int y = 0; y < image.GetLength(1); y++)
+            {
+                for(int x = 0; x < image.GetLength(0); x++)
+                {
+                    if (regions[x, y] != 0)
+                        image[x, y] = colors[regions[x, y] - 1];
+                    else
+                        image[x, y] = Color.White;
+                }
+            }
         }
 
         private Color[,] InvertImage(Color[,] InputImage)
@@ -546,36 +646,117 @@ namespace INFOIBV
             return res;
         }
 
+
         private int[,] RegionDetection(Color[,] BinaryImage, Color[,] EdgeImage)
         {
             var res = new int[BinaryImage.GetLength(0), BinaryImage.GetLength(1)];
             int counter = 1;
-            
-            for(int  y = 0; y < BinaryImage.GetLength(0); y++)
+            var collisions = new Dictionary<int, int>();
+            for(int  y = 0; y < BinaryImage.GetLength(1); y++)
             {
-                for(int x = 0; x < BinaryImage.GetLength(1); x++)
+                for(int x = 0; x < BinaryImage.GetLength(0); x++)
                 {
                     if(BinaryImage[x,y].R == 0)
                     {
                         int hasNeighbor = 0;
+                        List<int> spottedRegions = new List<int>();
                         for(int i = -1; i < 2; i++)
                         {
-                            for(int j = -1; j < 2; j++)
+                            for(int j = -1; j < 1; j++)
                             {
                                 if(x + i >= 0 && x + i < BinaryImage.GetLength(0) && y + j >= 0 && y + j < BinaryImage.GetLength(1))
                                 {
                                     if(res[x+i, y+j] != 0)
                                     {
+                                        if (hasNeighbor == 0)
+                                            hasNeighbor = res[x + i, y + j];
+                                        else if (hasNeighbor != 0 && hasNeighbor != res[x + i, y + j])
+                                        {
+                                            // Do something res[x + i, y + j] < hasNeighbor 
+                                            // Colision
+                                            
 
+                                            if(res[x + i, y + j] < hasNeighbor)
+                                            {
+                                                if (collisions[hasNeighbor] > res[x + i, y + j] || collisions[hasNeighbor] == -1)
+                                                    collisions[hasNeighbor] = res[x + i, y + j];
+                                                // Do something special
+                                                hasNeighbor = res[x + i, y + j];
+                                            }
+                                            else
+                                            {
+                                                if (collisions[res[x + i, y + j]] > hasNeighbor || collisions[res[x + i, y + j]] == -1)
+                                                    collisions[res[x + i, y + j]] = hasNeighbor;
+                                            }
+                                        }
                                     }
                                 }
                             }
+                        }
+                        if (hasNeighbor == 0 || EdgeImage[x,y].R < (int)numericUpDownEdgeThreshold.Value)
+                        {
+                            res[x, y] = counter;
+                            collisions.Add(counter++, -1);
+                            maxRegions++;
+                        }
+                        else
+                            res[x, y] = hasNeighbor;
+                    }
+                }
+            }
+
+            for (int y = 0; y < BinaryImage.GetLength(1); y++)
+            {
+                for (int x = 0; x < BinaryImage.GetLength(0); x++)
+                {
+                    if(res[x,y] != 0)
+                    {
+                        while(collisions[res[x,y]] != -1)
+                        {
+                            res[x, y] = collisions[res[x, y]];
                         }
                     }
                 }
             }
 
             return res;
+
+                    // In case of desperation:
+
+                    //bool change = true;
+                    //while(change)
+                    //{
+                    //    change = false;
+                    //    for (int y = 0; y < BinaryImage.GetLength(0); y++)
+                    //    {
+                    //        for (int x = 0; x < BinaryImage.GetLength(1); x++)
+                    //        {
+                    //            if(res[x,y] != 0)
+                    //            {
+                    //                int low = res[x, y];
+                    //                for (int i = -1; i < 2; i++)
+                    //                {
+                    //                    for (int j = -1; j < 2; j++)
+                    //                    {
+                    //                        if (x + i >= 0 && x + i < BinaryImage.GetLength(0) && y + j >= 0 && y + j < BinaryImage.GetLength(1))
+                    //                        {
+                    //                            if (res[x + i, y + j] < low && res[x + i, y + j] != 0)
+                    //                                low = res[x + i, y + j];
+                    //                        }
+                    //                    }
+                    //                }
+
+                    //                if(low != res[x, y])
+                    //                {
+                    //                    res[x, y] = low;
+                    //                    change = true;
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
+
+                    return res;
         }
 
         private void saveButton_Click(object sender, EventArgs e)
@@ -590,5 +771,45 @@ namespace INFOIBV
             return (value < min) ? min : (value > max) ? max : value;
         }
 
+
+        private Color[,] ApplyEdgeSharpening(Color[,] InputImage, Color[,] blurImage, double scalar, int mt = 0)
+        {
+            var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
+            int sqr = (int)Math.Sqrt(1);
+            int fromX = (mt % sqr) * InputImage.GetLength(0) / sqr;
+            int toX = ((mt % sqr) + 1) * InputImage.GetLength(0) / sqr;
+            int fromY = (int)(mt / sqr) * InputImage.GetLength(1) / sqr;
+            int toY = ((int)(mt / sqr) + 1) * InputImage.GetLength(1) / sqr;
+            for (int x = fromX; x < toX; x++)
+            {
+                for (int y = fromY; y < toY; y++)
+                {
+                    int blurR = blurImage[x, y].R;
+                    int blurG = blurImage[x, y].G; ;
+                    int blurB = blurImage[x, y].B; ;
+
+                    Color normal = InputImage[x, y];
+                    int normalR = normal.R;
+                    int normalG = normal.G;
+                    int normalB = normal.B;
+
+                    int newR = Clamp((int)(((1 + scalar) * normalR) - (scalar * blurR)), 0, 255);
+                    int newG = Clamp((int)(((1 + scalar) * normalG) - (scalar * blurG)), 0, 255);
+                    int newB = Clamp((int)(((1 + scalar) * normalB) - (scalar * blurB)), 0, 255);
+
+                    res[x, y] = Color.FromArgb(newR, newG, newB);
+                }
+            }
+            return res;
+        }
+    }
+    public class ExactColor
+    {
+        public double R, G, B;
+
+        public ExactColor(double r, double g, double b)
+        {
+            R = r; G = g; B = b;
+        }
     }
 }
