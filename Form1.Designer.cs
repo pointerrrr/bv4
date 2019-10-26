@@ -32,9 +32,9 @@
             this.openImageDialog = new System.Windows.Forms.OpenFileDialog();
             this.imageFileName = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.applyButton = new System.Windows.Forms.Button();
+            this.ApplyButton = new System.Windows.Forms.Button();
             this.saveImageDialog = new System.Windows.Forms.SaveFileDialog();
-            this.saveButton = new System.Windows.Forms.Button();
+            this.SaveButton = new System.Windows.Forms.Button();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.comboBoxTask = new System.Windows.Forms.ComboBox();
@@ -42,6 +42,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.numericUpDownEdgeThreshold = new System.Windows.Forms.NumericUpDown();
             this.buttonSetAsImage = new System.Windows.Forms.Button();
+            this.labelEdgeThreshold = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).BeginInit();
@@ -81,30 +82,30 @@
             this.pictureBox1.TabIndex = 2;
             this.pictureBox1.TabStop = false;
             // 
-            // applyButton
+            // ApplyButton
             // 
-            this.applyButton.Location = new System.Drawing.Point(489, 12);
-            this.applyButton.Name = "applyButton";
-            this.applyButton.Size = new System.Drawing.Size(74, 23);
-            this.applyButton.TabIndex = 3;
-            this.applyButton.Text = "Apply";
-            this.applyButton.UseVisualStyleBackColor = true;
-            this.applyButton.Click += new System.EventHandler(this.applyButton_Click);
+            this.ApplyButton.Location = new System.Drawing.Point(489, 12);
+            this.ApplyButton.Name = "ApplyButton";
+            this.ApplyButton.Size = new System.Drawing.Size(74, 23);
+            this.ApplyButton.TabIndex = 3;
+            this.ApplyButton.Text = "Apply";
+            this.ApplyButton.UseVisualStyleBackColor = true;
+            this.ApplyButton.Click += new System.EventHandler(this.ApplyButton_Click);
             // 
             // saveImageDialog
             // 
             this.saveImageDialog.Filter = "Bitmap file (*.bmp)|*.bmp";
             this.saveImageDialog.InitialDirectory = "..\\..\\images";
             // 
-            // saveButton
+            // SaveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(948, 11);
-            this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(95, 23);
-            this.saveButton.TabIndex = 4;
-            this.saveButton.Text = "Save as BMP...";
-            this.saveButton.UseVisualStyleBackColor = true;
-            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            this.SaveButton.Location = new System.Drawing.Point(948, 11);
+            this.SaveButton.Name = "SaveButton";
+            this.SaveButton.Size = new System.Drawing.Size(95, 23);
+            this.SaveButton.TabIndex = 4;
+            this.SaveButton.Text = "Save as BMP...";
+            this.SaveButton.UseVisualStyleBackColor = true;
+            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
             // pictureBox2
             // 
@@ -154,6 +155,11 @@
             this.numericUpDownThreshold.Name = "numericUpDownThreshold";
             this.numericUpDownThreshold.Size = new System.Drawing.Size(95, 20);
             this.numericUpDownThreshold.TabIndex = 8;
+            this.numericUpDownThreshold.Value = new decimal(new int[] {
+            150,
+            0,
+            0,
+            0});
             // 
             // label1
             // 
@@ -175,6 +181,11 @@
             this.numericUpDownEdgeThreshold.Name = "numericUpDownEdgeThreshold";
             this.numericUpDownEdgeThreshold.Size = new System.Drawing.Size(120, 20);
             this.numericUpDownEdgeThreshold.TabIndex = 10;
+            this.numericUpDownEdgeThreshold.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
             // 
             // buttonSetAsImage
             // 
@@ -186,11 +197,21 @@
             this.buttonSetAsImage.UseVisualStyleBackColor = true;
             this.buttonSetAsImage.Click += new System.EventHandler(this.ButtonSetAsImage_Click);
             // 
+            // labelEdgeThreshold
+            // 
+            this.labelEdgeThreshold.AutoSize = true;
+            this.labelEdgeThreshold.Location = new System.Drawing.Point(641, 43);
+            this.labelEdgeThreshold.Name = "labelEdgeThreshold";
+            this.labelEdgeThreshold.Size = new System.Drawing.Size(82, 13);
+            this.labelEdgeThreshold.TabIndex = 12;
+            this.labelEdgeThreshold.Text = "Edge Threshold";
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1052, 810);
+            this.Controls.Add(this.labelEdgeThreshold);
             this.Controls.Add(this.buttonSetAsImage);
             this.Controls.Add(this.numericUpDownEdgeThreshold);
             this.Controls.Add(this.label1);
@@ -198,8 +219,8 @@
             this.Controls.Add(this.comboBoxTask);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.saveButton);
-            this.Controls.Add(this.applyButton);
+            this.Controls.Add(this.SaveButton);
+            this.Controls.Add(this.ApplyButton);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.imageFileName);
             this.Controls.Add(this.LoadImageButton);
@@ -222,9 +243,9 @@
         private System.Windows.Forms.OpenFileDialog openImageDialog;
         private System.Windows.Forms.TextBox imageFileName;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Button applyButton;
+        private System.Windows.Forms.Button ApplyButton;
         private System.Windows.Forms.SaveFileDialog saveImageDialog;
-        private System.Windows.Forms.Button saveButton;
+        private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.ComboBox comboBoxTask;
@@ -232,6 +253,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown numericUpDownEdgeThreshold;
         private System.Windows.Forms.Button buttonSetAsImage;
+        private System.Windows.Forms.Label labelEdgeThreshold;
     }
 }
 

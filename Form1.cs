@@ -47,7 +47,7 @@ namespace INFOIBV
             }
         }
 
-        private void applyButton_Click(object sender, EventArgs e)
+        private void ApplyButton_Click(object sender, EventArgs e)
         {
             if (InputImage == null) return;                                 // Get out if no input image
             if (OutputImage != null) OutputImage.Dispose();                 // Reset output image
@@ -79,7 +79,7 @@ namespace INFOIBV
                 case 1:
                     // Contrast Boost
                     var histo = ContrastHistogram(Image);
-                    Image = contrastAdjustment(Image);
+                    Image = ContrastAdjustment(Image);
                     break;
                 case 2:
                     // Edge Detection
@@ -106,7 +106,7 @@ namespace INFOIBV
                     break;
                 case 6:
                     // Region Detection
-                    Image = contrastAdjustment(Image);
+                    Image = ContrastAdjustment(Image);
                     var binaryImage = ApplyThresholding(Image, (int)numericUpDownThreshold.Value);
                     binaryImage = InvertImage(binaryImage);
                     var edgeImage = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
@@ -114,7 +114,7 @@ namespace INFOIBV
                     var zooi2 = ApplyLinearFilter(edgeImage, kernel3);
                     edgeImage = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
                     var regions = RegionDetection(binaryImage, edgeImage);
-                    drawRegions(Image, regions);
+                    DrawRegions(Image, regions);
                     break;
                 case 7:
                     // Object Detection
@@ -141,6 +141,21 @@ namespace INFOIBV
             
             pictureBox2.Image = (Image)OutputImage;                         // Display output image
             progressBar.Visible = false;                                    // Hide progress bar
+        }
+
+        private void ButtonSetAsImage_Click(object sender, EventArgs e)
+        {
+            InputImage = (Bitmap)OutputImage.Clone();
+
+            pictureBox1.Image = (Image)InputImage;
+        }
+
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            if (OutputImage == null) return;                                // Get out if no output image
+            if (saveImageDialog.ShowDialog() == DialogResult.OK)
+                OutputImage.Save(saveImageDialog.FileName);                 // Save the output image
         }
 
         private Color[,] ApplyLinearFilter( Color[,] InputImage, double[,] kernel, int mt = 0)
@@ -210,7 +225,7 @@ namespace INFOIBV
             return kernel;
         }
 
-        private void drawRegions(Color[,] image, int[,] regions)
+        private void DrawRegions(Color[,] image, int[,] regions)
         {
             Random rnd = new Random(1337);
             Color[] colors = new Color[maxRegions];
@@ -353,7 +368,7 @@ namespace INFOIBV
             return res;
         }
 
-        private Color[,] contrastAdjustment(Color[,] InputImage, int mt = 0)
+        private Color[,] ContrastAdjustment(Color[,] InputImage, int mt = 0)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
             int sqr = (int)Math.Sqrt(1);
@@ -567,13 +582,6 @@ namespace INFOIBV
             return res;
         }
 
-        private void ButtonSetAsImage_Click(object sender, EventArgs e)
-        {
-            InputImage = (Bitmap)OutputImage.Clone();
-            
-            pictureBox1.Image = (Image)InputImage;
-        }
-
         public Color[,] Erode(Color[,] InputImage, int?[,] kernel, bool grayscale = true, int mt = 0)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
@@ -764,13 +772,6 @@ namespace INFOIBV
                     //}
 
                     return res;
-        }
-
-        private void saveButton_Click(object sender, EventArgs e)
-        {
-            if (OutputImage == null) return;                                // Get out if no output image
-            if (saveImageDialog.ShowDialog() == DialogResult.OK)
-                OutputImage.Save(saveImageDialog.FileName);                 // Save the output image
         }
 
         private static int Clamp(int value, int min, int max)
