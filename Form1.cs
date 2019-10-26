@@ -567,6 +567,13 @@ namespace INFOIBV
             return res;
         }
 
+        private void ButtonSetAsImage_Click(object sender, EventArgs e)
+        {
+            InputImage = (Bitmap)OutputImage.Clone();
+            
+            pictureBox1.Image = (Image)InputImage;
+        }
+
         public Color[,] Erode(Color[,] InputImage, int?[,] kernel, bool grayscale = true, int mt = 0)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];

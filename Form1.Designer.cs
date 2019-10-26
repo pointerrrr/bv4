@@ -41,6 +41,7 @@
             this.numericUpDownThreshold = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.numericUpDownEdgeThreshold = new System.Windows.Forms.NumericUpDown();
+            this.buttonSetAsImage = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).BeginInit();
@@ -68,7 +69,7 @@
             this.imageFileName.Location = new System.Drawing.Point(116, 14);
             this.imageFileName.Name = "imageFileName";
             this.imageFileName.ReadOnly = true;
-            this.imageFileName.Size = new System.Drawing.Size(306, 20);
+            this.imageFileName.Size = new System.Drawing.Size(240, 20);
             this.imageFileName.TabIndex = 1;
             // 
             // pictureBox1
@@ -82,9 +83,9 @@
             // 
             // applyButton
             // 
-            this.applyButton.Location = new System.Drawing.Point(555, 12);
+            this.applyButton.Location = new System.Drawing.Point(489, 12);
             this.applyButton.Name = "applyButton";
-            this.applyButton.Size = new System.Drawing.Size(103, 23);
+            this.applyButton.Size = new System.Drawing.Size(74, 23);
             this.applyButton.TabIndex = 3;
             this.applyButton.Text = "Apply";
             this.applyButton.UseVisualStyleBackColor = true;
@@ -116,7 +117,7 @@
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(665, 14);
+            this.progressBar.Location = new System.Drawing.Point(569, 13);
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(276, 20);
             this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -137,7 +138,7 @@
             "Region Detection",
             "Object Detection",
             "Edge sharpening"});
-            this.comboBoxTask.Location = new System.Drawing.Point(428, 13);
+            this.comboBoxTask.Location = new System.Drawing.Point(362, 13);
             this.comboBoxTask.Name = "comboBoxTask";
             this.comboBoxTask.Size = new System.Drawing.Size(121, 21);
             this.comboBoxTask.TabIndex = 7;
@@ -175,11 +176,22 @@
             this.numericUpDownEdgeThreshold.Size = new System.Drawing.Size(120, 20);
             this.numericUpDownEdgeThreshold.TabIndex = 10;
             // 
+            // buttonSetAsImage
+            // 
+            this.buttonSetAsImage.Location = new System.Drawing.Point(851, 12);
+            this.buttonSetAsImage.Name = "buttonSetAsImage";
+            this.buttonSetAsImage.Size = new System.Drawing.Size(91, 23);
+            this.buttonSetAsImage.TabIndex = 11;
+            this.buttonSetAsImage.Text = "Set as Image";
+            this.buttonSetAsImage.UseVisualStyleBackColor = true;
+            this.buttonSetAsImage.Click += new System.EventHandler(this.ButtonSetAsImage_Click);
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1052, 810);
+            this.Controls.Add(this.buttonSetAsImage);
             this.Controls.Add(this.numericUpDownEdgeThreshold);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numericUpDownThreshold);
@@ -219,6 +231,7 @@
         private System.Windows.Forms.NumericUpDown numericUpDownThreshold;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown numericUpDownEdgeThreshold;
+        private System.Windows.Forms.Button buttonSetAsImage;
     }
 }
 
