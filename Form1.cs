@@ -138,7 +138,7 @@ namespace INFOIBV
             progressBar.Visible = false;
         }
 
-        void print(Color[,] Input, PictureBox output, Label textLable, String text)
+        void print(Color[,] Input, PictureBox output, Label textLabel, String text)
         {
             Bitmap pic = new Bitmap(Input.GetLength(0), Input.GetLength(1));
             // Copy array to output Bitmap
@@ -149,9 +149,9 @@ namespace INFOIBV
                     pic.SetPixel(x, y, Input[x, y]);               // Set the pixel color at coordinate (x,y)
                 }
             }
-
+            OutputImage = pic;
             output.Image = (Image)pic;                         // Display output image
-            textLable.Text = text;
+            textLabel.Text = text;
             
         }
         private void ButtonSetAsImage_Click(object sender, EventArgs e)

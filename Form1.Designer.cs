@@ -68,7 +68,7 @@
             // 
             // LoadImageButton
             // 
-            this.LoadImageButton.Location = new System.Drawing.Point(12, 12);
+            this.LoadImageButton.Location = new System.Drawing.Point(12, 10);
             this.LoadImageButton.Name = "LoadImageButton";
             this.LoadImageButton.Size = new System.Drawing.Size(98, 23);
             this.LoadImageButton.TabIndex = 0;
@@ -84,7 +84,7 @@
             // 
             // imageFileName
             // 
-            this.imageFileName.Location = new System.Drawing.Point(116, 14);
+            this.imageFileName.Location = new System.Drawing.Point(116, 12);
             this.imageFileName.Name = "imageFileName";
             this.imageFileName.ReadOnly = true;
             this.imageFileName.Size = new System.Drawing.Size(240, 20);
@@ -101,7 +101,7 @@
             // 
             // ApplyButton
             // 
-            this.ApplyButton.Location = new System.Drawing.Point(489, 12);
+            this.ApplyButton.Location = new System.Drawing.Point(489, 11);
             this.ApplyButton.Name = "ApplyButton";
             this.ApplyButton.Size = new System.Drawing.Size(74, 23);
             this.ApplyButton.TabIndex = 3;
@@ -135,7 +135,7 @@
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(569, 13);
+            this.progressBar.Location = new System.Drawing.Point(569, 12);
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(276, 20);
             this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -156,7 +156,7 @@
             "Region Detection",
             "Object Detection",
             "Edge sharpening"});
-            this.comboBoxTask.Location = new System.Drawing.Point(362, 13);
+            this.comboBoxTask.Location = new System.Drawing.Point(362, 12);
             this.comboBoxTask.Name = "comboBoxTask";
             this.comboBoxTask.Size = new System.Drawing.Size(121, 21);
             this.comboBoxTask.TabIndex = 7;
@@ -206,7 +206,7 @@
             // 
             // buttonSetAsImage
             // 
-            this.buttonSetAsImage.Location = new System.Drawing.Point(851, 12);
+            this.buttonSetAsImage.Location = new System.Drawing.Point(851, 11);
             this.buttonSetAsImage.Name = "buttonSetAsImage";
             this.buttonSetAsImage.Size = new System.Drawing.Size(91, 23);
             this.buttonSetAsImage.TabIndex = 11;
@@ -328,7 +328,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1940, 1137);
+            this.ClientSize = new System.Drawing.Size(1940, 1061);
             this.Controls.Add(this.labelEdge);
             this.Controls.Add(this.numericUpDownThresholdEdgeDetection);
             this.Controls.Add(this.label6);
