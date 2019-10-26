@@ -114,9 +114,10 @@ namespace INFOIBV
                     print(edgeImage, pictureBox4, label4, "Edge detection:");
                     double[,] kernel3 = CreateGaussianKernel(3, (double)2);
                     var zooi2 = ApplyLinearFilter(edgeImage, kernel3);
-                    edgeImage = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
-                    print(edgeImage, pictureBox5, label5, "Edge Sharpening");
+                    //edgeImage = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
+                    //print(edgeImage, pictureBox5, label5, "Edge Sharpening");
                     edgeImage = ApplyThresholding(edgeImage, (int)numericUpDownThresholdEdgeDetection.Value);
+                    edgeImage = InvertImage(edgeImage);
                     print(edgeImage, pictureBox6, label6, "Thresholded Edge");
                     var regions = RegionDetection(binaryImage, edgeImage);
                     DrawRegions(Image, regions);
@@ -147,6 +148,7 @@ namespace INFOIBV
                 for (int y = 0; y < InputImage.Size.Height; y++)
                 {
                     pic.SetPixel(x, y, Input[x, y]);               // Set the pixel color at coordinate (x,y)
+                    OutputImage.SetPixel(x, y, Input[x, y]);
                 }
             }
 
@@ -701,11 +703,12 @@ namespace INFOIBV
                                     {
                                         if (hasNeighbor == 0)
                                             hasNeighbor = res[x + i, y + j];
-                                        else if (hasNeighbor != 0 && hasNeighbor != res[x + i, y + j])
+                                        else if (hasNeighbor != res[x + i, y + j])
                                         {
                                             // Do something res[x + i, y + j] < hasNeighbor 
                                             // Colision
-                                            
+                                            int test1 = res[x + i, y + j];
+                                            int test2 = hasNeighbor;
 
                                             if(res[x + i, y + j] < hasNeighbor)
                                             {
@@ -727,7 +730,8 @@ namespace INFOIBV
                         if (hasNeighbor == 0 || EdgeImage[x,y].R < (int)numericUpDownEdgeThreshold.Value)
                         {
                             res[x, y] = counter;
-                            collisions.Add(counter++, -1);
+                            collisions.Add(counter, -1);
+                            counter++;
                             maxRegions++;
                         }
                         else
@@ -740,10 +744,12 @@ namespace INFOIBV
             {
                 for (int x = 0; x < BinaryImage.GetLength(0); x++)
                 {
-                    if(res[x,y] != 0)
+                    if (res[x, y] != 0)
                     {
-                        while(collisions[res[x,y]] != -1)
+                        int debug = res[x, y];
+                        while (collisions[res[x, y]] != -1)
                         {
+                            int debug2 = collisions[res[x, y]];
                             res[x, y] = collisions[res[x, y]];
                         }
                     }
