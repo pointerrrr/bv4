@@ -118,7 +118,7 @@ namespace INFOIBV
                     print(edgeImage7, pictureBox5, label5, "Edge Sharpening");
                     var edgeImage2 = ApplyThresholding(edgeImage7, (int)numericUpDownThresholdEdgeDetection.Value);
                     var edgeImage3 = InvertImage(edgeImage2);
-                    kernel = CreateStructure(kernelDimensionSize);
+                    kernel = CreateStructure(kernelDimensionSize, 3, true);
                     var edgeImage4 = Erode(edgeImage3, kernel);
                     var edgeImage5 = Dilate(edgeImage4, kernel);
                     var edgeImage6 = ApplyThresholding(edgeImage5, (int)numericUpDownThreshold.Value);
@@ -534,17 +534,39 @@ namespace INFOIBV
             return res;
         }
 
-        public int?[,] CreateStructure(int size, int? value = 3, bool grayscale = true)
+        public int?[,] CreateStructure(int size, int? value = 3, bool plus = false, bool grayscale = true)
         {
             var result = new int?[size, size];
-            for (int x = 0; x < size; x++)
+            if (plus)
             {
-                for (int y = 0; y < size; y++)
+                for(int i = 0; i < size; i++)
                 {
-                    if (grayscale)
-                        result[x, y] = value;
-                    else
-                        result[x, y] = 1;
+                    for(int j = 0; j < size; j++)
+                    {
+                        int x = i - size / 2;
+                        int y = j - size / 2;
+
+                        if(x == 0 || y == 0)
+                        {
+                            if (grayscale)
+                                result[i, j] = value;
+                            else
+                                result[i, j] = 1;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    for (int y = 0; y < size; y++)
+                    {
+                        if (grayscale)
+                            result[x, y] = value;
+                        else
+                            result[x, y] = 1;
+                    }
                 }
             }
             return result;
