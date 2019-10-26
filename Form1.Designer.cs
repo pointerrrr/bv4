@@ -61,6 +61,10 @@
             this.checkBoxCrossings = new System.Windows.Forms.CheckBox();
             this.labelLineLength = new System.Windows.Forms.Label();
             this.labelMaxLineLength = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.numericUpDownnAng = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownnRad = new System.Windows.Forms.NumericUpDown();
+            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).BeginInit();
@@ -72,6 +76,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThresholdEdgeDetection)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.LineLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.LineGap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownnAng)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownnRad)).BeginInit();
             this.SuspendLayout();
             // 
             // LoadImageButton
@@ -420,11 +426,67 @@
             this.labelMaxLineLength.TabIndex = 30;
             this.labelMaxLineLength.Text = "Maximum Line Length";
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(1176, 47);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(32, 13);
+            this.label7.TabIndex = 31;
+            this.label7.Text = "nAng";
+            // 
+            // numericUpDownnAng
+            // 
+            this.numericUpDownnAng.Location = new System.Drawing.Point(1214, 44);
+            this.numericUpDownnAng.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownnAng.Name = "numericUpDownnAng";
+            this.numericUpDownnAng.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDownnAng.TabIndex = 32;
+            this.numericUpDownnAng.Value = new decimal(new int[] {
+            256,
+            0,
+            0,
+            0});
+            // 
+            // numericUpDownnRad
+            // 
+            this.numericUpDownnRad.Location = new System.Drawing.Point(1379, 44);
+            this.numericUpDownnRad.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.numericUpDownnRad.Name = "numericUpDownnRad";
+            this.numericUpDownnRad.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDownnRad.TabIndex = 33;
+            this.numericUpDownnRad.Value = new decimal(new int[] {
+            256,
+            0,
+            0,
+            0});
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(1340, 47);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(33, 13);
+            this.label8.TabIndex = 34;
+            this.label8.Text = "nRad";
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1940, 1061);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.numericUpDownnRad);
+            this.Controls.Add(this.numericUpDownnAng);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.labelMaxLineLength);
             this.Controls.Add(this.labelLineLength);
             this.Controls.Add(this.checkBoxCrossings);
@@ -471,6 +533,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThresholdEdgeDetection)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.LineLength)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.LineGap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownnAng)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownnRad)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -511,6 +575,10 @@
         private System.Windows.Forms.CheckBox checkBoxCrossings;
         private System.Windows.Forms.Label labelLineLength;
         private System.Windows.Forms.Label labelMaxLineLength;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown numericUpDownnAng;
+        private System.Windows.Forms.NumericUpDown numericUpDownnRad;
+        private System.Windows.Forms.Label label8;
     }
 }
 
