@@ -484,7 +484,12 @@ namespace INFOIBV
                     greenY *= greenY;
                     blueY *= blueY;
 
-                    res[x, y] = Color.FromArgb((int)Math.Sqrt(redX + redY), (int)Math.Sqrt(greenX + greenY), (int)Math.Sqrt(blueX + blueY));
+                    //res[x, y] = Color.FromArgb((int)Math.Sqrt(redX + redY), (int)Math.Sqrt(greenX + greenY), (int)Math.Sqrt(blueX + blueY));
+                    int colorR = (int)Math.Sqrt(redX + redY);
+                    int colorG = (int)Math.Sqrt(greenX + greenY);
+                    int colorB = (int)Math.Sqrt(blueX + blueY);
+                    int color = Math.Max(colorR, Math.Max(colorG, colorB));
+                    res[x, y] = Color.FromArgb(color, color, color);
                 }
             }
             return res;
