@@ -69,8 +69,9 @@ namespace INFOIBV
                     Image[x, y] = InputImage.GetPixel(x, y);                // Set pixel color in array at (x,y)
                 }
             }
-
-            switch(comboBoxTask.SelectedIndex)
+            var histo = ContrastHistogram(Image);
+            int kernelDimensionSize = 3;
+            switch (comboBoxTask.SelectedIndex)
             {
                 case 0:
                     // Thresholding
@@ -78,7 +79,7 @@ namespace INFOIBV
                     break;
                 case 1:
                     // Contrast Boost
-                    var histo = ContrastHistogram(Image);
+                    
                     Image = ContrastAdjustment(Image);
                     break;
                 case 2:
@@ -88,14 +89,13 @@ namespace INFOIBV
                     break;
                 case 3:
                     // Opening (erosion -> dilation)
-                    int kernelDimensionSize = 3;
                     int?[,] kernel = CreateStructure(kernelDimensionSize);
                     var erode = Erode(Image, kernel);
                     Image = Dilate(erode, kernel);
                     break;
                 case 4:
                     // Closing (dilation -> erosion)
-                    kernelDimensionSize = 3;
+                    
                     kernel = CreateStructure(kernelDimensionSize);
                     var dilate = Dilate(Image, kernel);
                     Image = Erode(dilate, kernel);
@@ -106,20 +106,24 @@ namespace INFOIBV
                     break;
                 case 6:
                     // Region Detection
-                    Image = ContrastAdjustment(Image);
+                    //Image = ContrastAdjustment(Image);
                     var binaryImage = ApplyThresholding(Image, (int)numericUpDownThreshold.Value);
-                    binaryImage = InvertImage(binaryImage);
-                    print(binaryImage, pictureBox3, label3, "Binary Iamge:");
+                    var binaryImage2 = InvertBinary(binaryImage);
+                    print(binaryImage2, pictureBox3, label3, "Binary Iamge:");
                     var edgeImage = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
                     print(edgeImage, pictureBox4, label4, "Edge detection:");
                     double[,] kernel3 = CreateGaussianKernel(3, (double)2);
                     var zooi2 = ApplyLinearFilter(edgeImage, kernel3);
-                    //edgeImage = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
-                    //print(edgeImage, pictureBox5, label5, "Edge Sharpening");
-                    edgeImage = ApplyThresholding(edgeImage, (int)numericUpDownThresholdEdgeDetection.Value);
-                    edgeImage = InvertImage(edgeImage);
-                    print(edgeImage, pictureBox6, label6, "Thresholded Edge");
-                    var regions = RegionDetection(binaryImage, edgeImage);
+                    var edgeImage7 = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
+                    print(edgeImage7, pictureBox5, label5, "Edge Sharpening");
+                    var edgeImage2 = ApplyThresholding(edgeImage7, (int)numericUpDownThresholdEdgeDetection.Value);
+                    var edgeImage3 = InvertImage(edgeImage2);
+                    kernel = CreateStructure(kernelDimensionSize);
+                    var edgeImage4 = Erode(edgeImage3, kernel);
+                    var edgeImage5 = Dilate(edgeImage4, kernel);
+                    var edgeImage6 = ApplyThresholding(edgeImage5, (int)numericUpDownThreshold.Value);
+                    print(edgeImage6, pictureBox6, label6, "Thresholded Edge");
+                    var regions = RegionDetection(binaryImage2, edgeImage6);
                     DrawRegions(Image, regions);
                     break;
                 case 7:
@@ -131,6 +135,9 @@ namespace INFOIBV
                     double[,] kernel2 = CreateGaussianKernel(3, (double)2); 
                     var zooi = ApplyLinearFilter(Image, kernel2);
                     Image = ApplyEdgeSharpening(Image, zooi, (double)3);
+                    break;
+                case 9:
+                    Image = InvertImage(Image);
                     break;
                 default:
                     return;
@@ -151,7 +158,6 @@ namespace INFOIBV
                     OutputImage.SetPixel(x, y, Input[x, y]);
                 }
             }
-            OutputImage = pic;
             output.Image = (Image)pic;                         // Display output image
             textLabel.Text = text;
             
@@ -273,6 +279,24 @@ namespace INFOIBV
             return res;
         }
 
+        private Color[,] InvertBinary(Color[,] Input)
+        {
+            var res = new Color[Input.GetLength(0), Input.GetLength(1)];
+
+            for (int i = 0; i < Input.GetLength(0); i++)
+            {
+                for (int j = 0; j < Input.GetLength(1); j++)
+                {
+                    var startColor = Input[i, j];
+                    if (startColor.R == 255)
+                        res[i, j] = Color.Black;
+                    else
+                        res[i, j] = Color.White;
+                }
+            }
+            return res;
+        }
+
         private Color[,] ApplyThresholding(Color[,] InputImage, int threshholdValue, int mt = 0)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
@@ -285,10 +309,12 @@ namespace INFOIBV
             {
                 for (int y = fromY; y < toY; y++)
                 {
+                    if(x==144 && y == 182)
+                    { int a = 0; }
                     Color pixelColor = InputImage[x, y];
-                    Color updatedColor = Color.Black;
+                    Color updatedColor = Color.FromArgb(0,0,0);
                     if (pixelColor.R >= threshholdValue || pixelColor.G >= threshholdValue || pixelColor.B >= threshholdValue)
-                        updatedColor = Color.White;
+                        updatedColor = Color.FromArgb(255,255,255);
                     res[x, y] = updatedColor;
                 }
             }
@@ -689,54 +715,54 @@ namespace INFOIBV
             {
                 for(int x = 0; x < BinaryImage.GetLength(0); x++)
                 {
-                    if(BinaryImage[x,y].R == 0)
+                    if (EdgeImage[x, y].R == 0)
+                        continue;
+                    int hasNeighbor = 0;
+                    List<int> spottedRegions = new List<int>();
+                    for(int i = -1; i < 2; i++)
                     {
-                        int hasNeighbor = 0;
-                        List<int> spottedRegions = new List<int>();
-                        for(int i = -1; i < 2; i++)
+                        for(int j = -1; j < 1; j++)
                         {
-                            for(int j = -1; j < 1; j++)
+                            if(x + i >= 0 && x + i < BinaryImage.GetLength(0) && y + j >= 0 && y + j < BinaryImage.GetLength(1))
                             {
-                                if(x + i >= 0 && x + i < BinaryImage.GetLength(0) && y + j >= 0 && y + j < BinaryImage.GetLength(1))
+                                if(res[x+i, y+j] != 0)
                                 {
-                                    if(res[x+i, y+j] != 0)
+                                    if (hasNeighbor == 0)
+                                        hasNeighbor = res[x + i, y + j];
+                                    else if (hasNeighbor != res[x + i, y + j])
                                     {
-                                        if (hasNeighbor == 0)
-                                            hasNeighbor = res[x + i, y + j];
-                                        else if (hasNeighbor != res[x + i, y + j])
-                                        {
-                                            // Do something res[x + i, y + j] < hasNeighbor 
-                                            // Colision
-                                            int test1 = res[x + i, y + j];
-                                            int test2 = hasNeighbor;
+                                        // Do something res[x + i, y + j] < hasNeighbor 
+                                        // Colision
+                                        int test1 = res[x + i, y + j];
+                                        int test2 = hasNeighbor;
 
-                                            if(res[x + i, y + j] < hasNeighbor)
-                                            {
-                                                if (collisions[hasNeighbor] > res[x + i, y + j] || collisions[hasNeighbor] == -1)
-                                                    collisions[hasNeighbor] = res[x + i, y + j];
-                                                // Do something special
-                                                hasNeighbor = res[x + i, y + j];
-                                            }
-                                            else
-                                            {
-                                                if (collisions[res[x + i, y + j]] > hasNeighbor || collisions[res[x + i, y + j]] == -1)
-                                                    collisions[res[x + i, y + j]] = hasNeighbor;
-                                            }
+                                        if(res[x + i, y + j] < hasNeighbor)
+                                        {
+                                            if (collisions[hasNeighbor] > res[x + i, y + j] || collisions[hasNeighbor] == -1)
+                                                collisions[hasNeighbor] = res[x + i, y + j];
+                                            // Do something special
+                                            hasNeighbor = res[x + i, y + j];
+                                        }
+                                        else
+                                        {
+                                            if (collisions[res[x + i, y + j]] > hasNeighbor || collisions[res[x + i, y + j]] == -1)
+                                                collisions[res[x + i, y + j]] = hasNeighbor;
                                         }
                                     }
                                 }
                             }
                         }
-                        if (hasNeighbor == 0 || EdgeImage[x,y].R < (int)numericUpDownEdgeThreshold.Value)
-                        {
-                            res[x, y] = counter;
-                            collisions.Add(counter, -1);
-                            counter++;
-                            maxRegions++;
-                        }
-                        else
-                            res[x, y] = hasNeighbor;
                     }
+                    
+                    if (hasNeighbor == 0)
+                    {
+                        res[x, y] = counter;
+                        collisions.Add(counter, -1);
+                        counter++;
+                        maxRegions++;
+                    }
+                    else
+                        res[x, y] = hasNeighbor;
                 }
             }
 

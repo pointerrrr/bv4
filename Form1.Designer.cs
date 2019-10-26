@@ -155,7 +155,8 @@
             "Line Detection",
             "Region Detection",
             "Object Detection",
-            "Edge sharpening"});
+            "Edge sharpening",
+            "Invert"});
             this.comboBoxTask.Location = new System.Drawing.Point(362, 12);
             this.comboBoxTask.Name = "comboBoxTask";
             this.comboBoxTask.Size = new System.Drawing.Size(121, 21);
@@ -252,7 +253,7 @@
             // 
             // pictureBox6
             // 
-            this.pictureBox6.Location = new System.Drawing.Point(1063, 623);
+            this.pictureBox6.Location = new System.Drawing.Point(1066, 623);
             this.pictureBox6.Name = "pictureBox6";
             this.pictureBox6.Size = new System.Drawing.Size(512, 512);
             this.pictureBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -311,9 +312,19 @@
             // numericUpDownThresholdEdgeDetection
             // 
             this.numericUpDownThresholdEdgeDetection.Location = new System.Drawing.Point(515, 41);
+            this.numericUpDownThresholdEdgeDetection.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
             this.numericUpDownThresholdEdgeDetection.Name = "numericUpDownThresholdEdgeDetection";
             this.numericUpDownThresholdEdgeDetection.Size = new System.Drawing.Size(120, 20);
             this.numericUpDownThresholdEdgeDetection.TabIndex = 23;
+            this.numericUpDownThresholdEdgeDetection.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
             // 
             // labelEdge
             // 
