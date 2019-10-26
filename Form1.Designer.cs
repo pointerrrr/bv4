@@ -39,14 +39,31 @@
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.comboBoxTask = new System.Windows.Forms.ComboBox();
             this.numericUpDownThreshold = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labelThreshold = new System.Windows.Forms.Label();
             this.numericUpDownEdgeThreshold = new System.Windows.Forms.NumericUpDown();
             this.buttonSetAsImage = new System.Windows.Forms.Button();
             this.labelEdgeThreshold = new System.Windows.Forms.Label();
+            this.pictureBox5 = new System.Windows.Forms.PictureBox();
+            this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.pictureBox6 = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.numericUpDownThresholdEdgeDetection = new System.Windows.Forms.NumericUpDown();
+            this.labelEdge = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownEdgeThreshold)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThresholdEdgeDetection)).BeginInit();
             this.SuspendLayout();
             // 
             // LoadImageButton
@@ -75,7 +92,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(13, 298);
+            this.pictureBox1.Location = new System.Drawing.Point(12, 76);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(512, 512);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -109,7 +126,7 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Location = new System.Drawing.Point(531, 298);
+            this.pictureBox2.Location = new System.Drawing.Point(530, 76);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(512, 512);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -161,14 +178,14 @@
             0,
             0});
             // 
-            // label1
+            // labelThreshold
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(855, 43);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(86, 13);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "Image Threshold";
+            this.labelThreshold.AutoSize = true;
+            this.labelThreshold.Location = new System.Drawing.Point(855, 43);
+            this.labelThreshold.Name = "labelThreshold";
+            this.labelThreshold.Size = new System.Drawing.Size(86, 13);
+            this.labelThreshold.TabIndex = 9;
+            this.labelThreshold.Text = "Image Threshold";
             // 
             // numericUpDownEdgeThreshold
             // 
@@ -206,15 +223,128 @@
             this.labelEdgeThreshold.TabIndex = 12;
             this.labelEdgeThreshold.Text = "Edge Threshold";
             // 
+            // pictureBox5
+            // 
+            this.pictureBox5.Location = new System.Drawing.Point(530, 623);
+            this.pictureBox5.Name = "pictureBox5";
+            this.pictureBox5.Size = new System.Drawing.Size(512, 512);
+            this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox5.TabIndex = 14;
+            this.pictureBox5.TabStop = false;
+            // 
+            // pictureBox4
+            // 
+            this.pictureBox4.Location = new System.Drawing.Point(12, 623);
+            this.pictureBox4.Name = "pictureBox4";
+            this.pictureBox4.Size = new System.Drawing.Size(512, 512);
+            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox4.TabIndex = 13;
+            this.pictureBox4.TabStop = false;
+            // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Location = new System.Drawing.Point(1063, 76);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(512, 512);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox3.TabIndex = 15;
+            this.pictureBox3.TabStop = false;
+            // 
+            // pictureBox6
+            // 
+            this.pictureBox6.Location = new System.Drawing.Point(1063, 623);
+            this.pictureBox6.Name = "pictureBox6";
+            this.pictureBox6.Size = new System.Drawing.Size(512, 512);
+            this.pictureBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox6.TabIndex = 16;
+            this.pictureBox6.TabStop = false;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 57);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(63, 13);
+            this.label1.TabIndex = 17;
+            this.label1.Text = "Input Image";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(536, 60);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(0, 13);
+            this.label2.TabIndex = 18;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(12, 607);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(0, 13);
+            this.label4.TabIndex = 19;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(536, 607);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(0, 13);
+            this.label5.TabIndex = 20;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(1060, 60);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(0, 13);
+            this.label3.TabIndex = 21;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(1060, 607);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(0, 13);
+            this.label6.TabIndex = 22;
+            // 
+            // numericUpDownThresholdEdgeDetection
+            // 
+            this.numericUpDownThresholdEdgeDetection.Location = new System.Drawing.Point(515, 41);
+            this.numericUpDownThresholdEdgeDetection.Name = "numericUpDownThresholdEdgeDetection";
+            this.numericUpDownThresholdEdgeDetection.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDownThresholdEdgeDetection.TabIndex = 23;
+            // 
+            // labelEdge
+            // 
+            this.labelEdge.AutoSize = true;
+            this.labelEdge.Location = new System.Drawing.Point(369, 43);
+            this.labelEdge.Name = "labelEdge";
+            this.labelEdge.Size = new System.Drawing.Size(131, 13);
+            this.labelEdge.TabIndex = 24;
+            this.labelEdge.Text = "Edge Detection Threshold";
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1052, 810);
+            this.ClientSize = new System.Drawing.Size(1940, 1137);
+            this.Controls.Add(this.labelEdge);
+            this.Controls.Add(this.numericUpDownThresholdEdgeDetection);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.pictureBox6);
+            this.Controls.Add(this.pictureBox3);
+            this.Controls.Add(this.pictureBox5);
+            this.Controls.Add(this.pictureBox4);
             this.Controls.Add(this.labelEdgeThreshold);
             this.Controls.Add(this.buttonSetAsImage);
             this.Controls.Add(this.numericUpDownEdgeThreshold);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.labelThreshold);
             this.Controls.Add(this.numericUpDownThreshold);
             this.Controls.Add(this.comboBoxTask);
             this.Controls.Add(this.progressBar);
@@ -232,6 +362,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownEdgeThreshold)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThresholdEdgeDetection)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -250,10 +385,22 @@
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.ComboBox comboBoxTask;
         private System.Windows.Forms.NumericUpDown numericUpDownThreshold;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelThreshold;
         private System.Windows.Forms.NumericUpDown numericUpDownEdgeThreshold;
         private System.Windows.Forms.Button buttonSetAsImage;
         private System.Windows.Forms.Label labelEdgeThreshold;
+        private System.Windows.Forms.PictureBox pictureBox5;
+        private System.Windows.Forms.PictureBox pictureBox4;
+        private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.PictureBox pictureBox6;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.NumericUpDown numericUpDownThresholdEdgeDetection;
+        private System.Windows.Forms.Label labelEdge;
     }
 }
 

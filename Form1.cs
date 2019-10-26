@@ -109,10 +109,15 @@ namespace INFOIBV
                     Image = ContrastAdjustment(Image);
                     var binaryImage = ApplyThresholding(Image, (int)numericUpDownThreshold.Value);
                     binaryImage = InvertImage(binaryImage);
+                    print(binaryImage, pictureBox3, label3, "Binary Iamge:");
                     var edgeImage = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
+                    print(edgeImage, pictureBox4, label4, "Edge detection:");
                     double[,] kernel3 = CreateGaussianKernel(3, (double)2);
                     var zooi2 = ApplyLinearFilter(edgeImage, kernel3);
                     edgeImage = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
+                    print(edgeImage, pictureBox5, label5, "Edge Sharpening");
+                    edgeImage = ApplyThresholding(edgeImage, (int)numericUpDownThresholdEdgeDetection.Value);
+                    print(edgeImage, pictureBox6, label6, "Thresholded Edge");
                     var regions = RegionDetection(binaryImage, edgeImage);
                     DrawRegions(Image, regions);
                     break;
@@ -129,20 +134,26 @@ namespace INFOIBV
                 default:
                     return;
             }
+            print(Image, pictureBox2, label2, "Output Image");
+            progressBar.Visible = false;
+        }
 
+        void print(Color[,] Input, PictureBox output, Label textLable, String text)
+        {
+            Bitmap pic = new Bitmap(Input.GetLength(0), Input.GetLength(1));
             // Copy array to output Bitmap
             for (int x = 0; x < InputImage.Size.Width; x++)
             {
                 for (int y = 0; y < InputImage.Size.Height; y++)
                 {
-                    OutputImage.SetPixel(x, y, Image[x, y]);               // Set the pixel color at coordinate (x,y)
+                    pic.SetPixel(x, y, Input[x, y]);               // Set the pixel color at coordinate (x,y)
                 }
             }
-            
-            pictureBox2.Image = (Image)OutputImage;                         // Display output image
-            progressBar.Visible = false;                                    // Hide progress bar
-        }
 
+            output.Image = (Image)pic;                         // Display output image
+            textLable.Text = text;
+            
+        }
         private void ButtonSetAsImage_Click(object sender, EventArgs e)
         {
             InputImage = (Bitmap)OutputImage.Clone();
