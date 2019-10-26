@@ -55,6 +55,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.numericUpDownThresholdEdgeDetection = new System.Windows.Forms.NumericUpDown();
             this.labelEdge = new System.Windows.Forms.Label();
+            this.Neighbour = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).BeginInit();
@@ -335,11 +336,22 @@
             this.labelEdge.TabIndex = 24;
             this.labelEdge.Text = "Edge Detection Threshold";
             // 
+            // Neighbour
+            // 
+            this.Neighbour.AutoSize = true;
+            this.Neighbour.Location = new System.Drawing.Point(234, 44);
+            this.Neighbour.Name = "Neighbour";
+            this.Neighbour.Size = new System.Drawing.Size(108, 17);
+            this.Neighbour.TabIndex = 25;
+            this.Neighbour.Text = "4 Neighbourhood";
+            this.Neighbour.UseVisualStyleBackColor = true;
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1940, 1061);
+            this.Controls.Add(this.Neighbour);
             this.Controls.Add(this.labelEdge);
             this.Controls.Add(this.numericUpDownThresholdEdgeDetection);
             this.Controls.Add(this.label6);
@@ -412,6 +424,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown numericUpDownThresholdEdgeDetection;
         private System.Windows.Forms.Label labelEdge;
+        private System.Windows.Forms.CheckBox Neighbour;
     }
 }
 

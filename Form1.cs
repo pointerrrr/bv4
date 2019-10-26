@@ -745,6 +745,8 @@ namespace INFOIBV
                     {
                         for(int j = -1; j < 1; j++)
                         {
+                            if (((i == -1 || i ==1) && j != 0) && Neighbour.Checked)
+                                continue;
                             if(x + i >= 0 && x + i < BinaryImage.GetLength(0) && y + j >= 0 && y + j < BinaryImage.GetLength(1))
                             {
                                 if(res[x+i, y+j] != 0)
