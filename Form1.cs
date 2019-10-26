@@ -102,7 +102,9 @@ namespace INFOIBV
                     break;
                 case 5:
                     // Line Detection
-
+                    var accumulatorArray = houghTransform(Image);
+                    var thresholdedArray = HoughThreshold(accumulatorArray);
+                    Image = HoughLineDetection(thresholdedArray, Image);
                     break;
                 case 6:
                     // Region Detection
@@ -844,6 +846,449 @@ namespace INFOIBV
                     //}
 
                     return res;
+        }
+
+        private int[,] houghTransform(Color[,] InputImage)
+        {
+            int xMid = InputImage.GetLength(0) / 2;
+            int yMid = InputImage.GetLength(1) / 2;
+            int nAng = 256;
+            double deltaAng = Math.PI / nAng;
+            int nRad = 256;
+            int cRad = nRad / 2;
+            double rMax = Math.Sqrt((xMid * xMid) + (yMid * yMid));
+            double deltaRad = (2d * rMax) / nRad;
+            bool binary = checkBinary(InputImage);
+            int[,] accumulatorArray = new int[nAng, nRad];
+            int max = 0;
+
+
+            for (int x = 0; x < InputImage.GetLength(0); x++)
+            {
+                for (int y = 0; y < InputImage.GetLength(1); y++)
+                {
+                    if (InputImage[x, y].R <= (int)this.numericUpDownThreshold.Value)
+                    {
+                        double u = x - xMid;
+                        double v = y - yMid;
+                        for (int i = 0; i < nAng; i++)
+                        {
+                            double theta = deltaAng * i;
+                            int ir = cRad + (int)Math.Round(((u * Math.Cos(theta)) + (v * Math.Sin(theta))) / deltaRad);
+                            if (ir >= 0 && ir < nRad)
+                            {
+                                if (binary)
+                                    accumulatorArray[i, ir]++;
+                                else
+                                    accumulatorArray[i, ir] += 255 - InputImage[x, y].R;
+                                if (accumulatorArray[i, ir] > max)
+                                    max = accumulatorArray[i, ir];
+                            }
+                        }
+                    }
+                }
+            }
+            /*
+            Image = new Color[nAng, nRad];
+            for (int x = 0; x < nAng; x++)
+            {
+                for (int y = 0; y < nRad; y++)
+                {
+                    int intensity = (int)((accumulatorArray[x, y] / (double)max) * 255d);
+                    Image[x, y] = Color.FromArgb(intensity, intensity, intensity);
+                }
+            }*/
+
+
+            return accumulatorArray;
+        }
+
+        private int[,] HoughThreshold(int[,] accumulatorArray)
+        {
+            int nAng = 256;
+            int nRad = 256;
+            int max = 0;
+
+            int[,] temp = new int[nAng, nRad];
+            for (int x = 0; x < 256; x++)
+            {
+                for (int y = 0; y < nRad; y++)
+                {
+                    bool smaller = false;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < 3; j++)
+                        {
+                            int xCoord = x + i - 1;
+                            int yCoord = y + j - 1;
+
+                            if (xCoord < 0 || xCoord >= 256 || yCoord < 0 || yCoord >= nRad)
+                            {
+                                continue;
+                            }
+                            if (accumulatorArray[x, y] < accumulatorArray[xCoord, yCoord])
+                                smaller = true;
+
+                        }
+                    }
+                    if (smaller)
+                        temp[x, y] = 0;
+                    else
+                    {
+                        if (accumulatorArray[x, y] > max)
+                            max = accumulatorArray[x, y];
+                        temp[x, y] = accumulatorArray[x, y];
+                    }
+
+                }
+            }
+
+            int threshold = (int)numericUpDownThreshold.Value;
+
+            
+            for (int x = 0; x < 256; x++)
+            {
+                for (int y = 0; y < nRad; y++)
+                {
+                    int value = (int)(temp[x, y] / (double)max * 255d);
+                    if (value >= threshold)
+                        ;//Image[x, y] = Color.FromArgb(value, value, value);
+                    else
+                    {
+                        temp[x, y] = 0;
+                        //Image[x, y] = Color.Black;
+                    }
+                }
+            }
+            return temp;
+        }
+
+        private Color[,] HoughLineDetection(int[,] accumulatorArray, Color[,] InputImage)
+        {
+            var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
+            int xMid = InputImage.GetLength(0) / 2;
+            int yMid = InputImage.GetLength(1) / 2;
+            int nAng = 256;
+            double deltaAng = Math.PI / nAng;
+            int nRad = 256;
+            double rMax = Math.Sqrt((xMid * xMid) + (yMid * yMid));
+
+            int intensityThreshold;
+            if (checkBinary(InputImage))
+                intensityThreshold = 0;
+            else
+                intensityThreshold = (int)this.numericUpDownThreshold.Value;
+
+            var locations = new List<Tuple<int, int>>();
+
+            for (int x = 0; x < accumulatorArray.GetLength(0); x++)
+            {
+                for (int y = 0; y < accumulatorArray.GetLength(1); y++)
+                {
+                    if (accumulatorArray[x, y] != 0)
+                        locations.Add(new Tuple<int, int>(x, y));
+                }
+            }
+
+            for (int i = 0; i < locations.Count; i++)
+            {
+                var point = locations[i];
+                double radians = (point.Item1 / (double)nRad) * Math.PI;
+                double length = ((nAng / 2d) - point.Item2) / (double)nAng * rMax * 2d;
+
+                double aanliggend = Math.Cos(radians) * length;
+                double overstaand = Math.Sqrt(length * length - aanliggend * aanliggend) * (length < 0 ? -1 : 1);
+                double slope1 = aanliggend / overstaand;
+                double slope2 = overstaand / aanliggend;
+                double b1 = (yMid - overstaand) - slope1 * aanliggend;
+                double b2 = (xMid - aanliggend) - (slope2) * overstaand;
+                //if (double.IsInfinity(b1))
+                //    b1 = aanliggend;
+
+                var lines = HoughLineDetection(InputImage, new Point(point.Item1, point.Item2), intensityThreshold, (int)LineLength.Value, (int)LineGap.Value);
+
+                if (Math.Abs(slope1) >= 1d)
+                {
+                    for (int j = 0; j < InputImage.GetLength(1); j++)
+                    {
+                        int x = (int)(slope2 * (yMid - j) + b2); ;
+                        if (x >= 0 && x < InputImage.GetLength(0))
+                        {
+                            foreach (var line in lines)
+                            {
+                                int startX = line.Item1.X;
+                                int stopX = line.Item2.X;
+                                int startY = line.Item1.Y;
+                                int stopY = line.Item2.Y;
+                                if (((x >= startX && x <= stopX) || (x <= startX && x >= stopX)) && j >= startY && j <= stopY)
+                                    res[x, j] = Color.Red;
+                            }
+                        }
+                    }
+                }
+                else if (Math.Abs(slope1) < 1d)
+                {
+                    for (int j = 0; j < InputImage.GetLength(0); j++)
+                    {
+                        int y = (int)(slope1 * (xMid - j) + b1);
+                        if (y >= 0 && y < InputImage.GetLength(1))
+                        {
+                            foreach (var line in lines)
+                            {
+                                int startX = line.Item1.X;
+                                int stopX = line.Item2.X;
+                                int startY = line.Item1.Y;
+                                int stopY = line.Item2.Y;
+                                if (j >= startX && j <= stopX && ((y >= startY && y <= stopY) || (y >= stopY && y <= startY)))
+                                    res[j, y] = Color.Red;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            if (checkBoxCrossings.Checked)
+            {
+                var crossings = FindCrossings(res, locations);
+                foreach (var crossing in crossings)
+                    DrawCircle(res, crossing.Item1, crossing.Item2, Color.Cyan, 5);
+            }
+
+            for (int x = 0; x < InputImage.GetLength(0); x++)
+            {
+                for (int y = 0; y < InputImage.GetLength(1); y++)
+                {
+                    if (res[x, y] != Color.Red && res[x, y] != Color.Cyan)
+                        res[x, y] = InputImage[x, y];
+                }
+            }
+            return res;
+        }
+
+        private List<Tuple<Point, Point>> HoughLineDetection(Color[,] InputImage, Point rTheta, int minimumThreshold, int minLength, int maxGap)
+        {
+            var result = new List<Tuple<Point, Point>>();
+            int xMid = InputImage.GetLength(0) / 2;
+            int yMid = InputImage.GetLength(1) / 2;
+            double rMax = Math.Sqrt((xMid * xMid) + (yMid * yMid));
+            var point = new Tuple<int, int>(rTheta.X, rTheta.Y);
+            double radians = point.Item1 / 256d * Math.PI;
+            double length = ((256d / 2d) - point.Item2) / 256d * rMax * 2d;
+
+            double aanliggend = Math.Cos(radians) * length;
+            double overstaand = Math.Sqrt(length * length - aanliggend * aanliggend) * (length < 0 ? -1 : 1);
+            double slope1 = aanliggend / overstaand;
+            double slope2 = overstaand / aanliggend;
+            double b1 = (yMid - overstaand) - slope1 * aanliggend;
+            double b2 = (xMid - aanliggend) - (slope2) * overstaand;
+
+            int curLength = 0;
+            int curGap = 0;
+            bool onLine = false;
+            Point startPoint = new Point(0, 0);
+
+            if (Math.Abs(slope1) >= 1d)
+            {
+                for (int j = 0; j < InputImage.GetLength(1); j++)
+                {
+                    int x = (int)(slope2 * (yMid - j) + b2);
+                    if (x >= 0 && x < InputImage.GetLength(0))
+                    {
+                        if (InputImage[x, j].R <= minimumThreshold)
+                        {
+                            if (!onLine)
+                            {
+                                onLine = true;
+                                startPoint = new Point(x, j);
+                                curLength = 0;
+                                curGap = 0;
+                            }
+                            curLength++;
+                            //curLength += curGap;
+                            curGap = 0;
+                        }
+                        else
+                        {
+                            curGap++;
+                            curLength++;
+                            if (curGap > maxGap)
+                            {
+                                // TODO: lijnsegment controleren
+                                if (curLength - curGap >= minLength)
+                                {
+
+                                    int oldX = (int)(slope2 * (yMid - j - curGap) + b2);
+                                    result.Add(new Tuple<Point, Point>(startPoint, new Point(oldX, j - curGap)));
+                                }
+                                curGap = 0;
+                                curLength = 0;
+                                onLine = false;
+                            }
+                        }
+                    }
+                    else if (onLine && curLength - curGap >= minLength)
+                    {
+                        int oldX = (int)(slope2 * (yMid - j + 1 - curGap) + b2);
+                        result.Add(new Tuple<Point, Point>(startPoint, new Point(oldX, j + 1 - curGap)));
+                        onLine = false;
+                    }
+                }
+                if (onLine && curLength - curGap >= minLength)
+                {
+                    int j = InputImage.GetLength(1) - 1 - curGap;
+                    int x = (int)(slope2 * (yMid - j) + b2);
+                    result.Add(new Tuple<Point, Point>(startPoint, new Point(x, j)));
+                }
+            }
+            else if (Math.Abs(slope1) < 1d)
+            {
+                for (int j = 0; j < InputImage.GetLength(0); j++)
+                {
+                    int y = (int)(slope1 * (xMid - j) + b1);
+                    if (y >= 0 && y < InputImage.GetLength(1))
+                    {
+                        if (InputImage[j, y].R <= minimumThreshold)
+                        {
+                            if (!onLine)
+                            {
+                                onLine = true;
+                                startPoint = new Point(j, y);
+                                curLength = 0;
+                                curGap = 0;
+                            }
+                            curLength++;
+                            //curLength += curGap;
+                            curGap = 0;
+                        }
+                        else
+                        {
+                            curGap++;
+                            curLength++;
+                            if (curGap > maxGap)
+                            {
+                                // TODO: lijnsegment controleren
+                                if (curLength - curGap >= minLength)
+                                {
+                                    int oldY = (int)(slope1 * (xMid - j - curGap) + b1);
+                                    result.Add(new Tuple<Point, Point>(startPoint, new Point(j - curGap, oldY)));
+                                }
+                                curGap = 0;
+                                curLength = 0;
+                                onLine = false;
+                            }
+                        }
+                    }
+                    else if (onLine && curLength - curGap >= minLength)
+                    {
+                        int oldY = (int)(slope1 * (xMid - j + 1 - curGap) + b1);
+                        result.Add(new Tuple<Point, Point>(startPoint, new Point(j + 1 - curGap, oldY)));
+                        onLine = false;
+                    }
+                }
+                if (onLine && curLength - curGap >= minLength)
+                {
+                    int j = InputImage.GetLength(0) - 1 - curGap;
+                    int y = (int)(slope1 * (xMid - j) + b1);
+                    result.Add(new Tuple<Point, Point>(startPoint, new Point(j, y)));
+                }
+            }
+            return result;
+        }
+
+        private bool checkBinary(Color[,] Image)
+        {
+            for (int x = 0; x < Image.GetLength(0); x++)
+            {
+                for (int y = 0; y < Image.GetLength(1); y++)
+                {
+                    Color pixel = Image[x, y];
+                    //check for binary if not black or white
+                    if (!((pixel.R == 0 && pixel.G == 0 && pixel.B == 0) || (pixel.R == 255 && pixel.G == 255 && pixel.B == 255)))
+                        return false;
+                }
+            }
+            return true;
+
+        }
+        private void DrawCircle(Color[,] image, int X, int Y, Color color, int r)
+        {
+            for (int i = 0; i < 2 * r + 1; i++)
+            {
+                for (int j = 0; j < 2 * r + 1; j++)
+                {
+                    double relX = i - r;
+                    double relY = j - r;
+                    if (Math.Abs(relX * relX + relY * relY - r * r) < r)
+                    {
+                        int newX = (int)(relX + X);
+                        int newY = (int)(relY + Y);
+                        if (newX >= 0 && newX < image.GetLength(0) && newY >= 0 && newY < image.GetLength(1))
+                            image[(int)(relX + X), (int)(relY + Y)] = color;
+                    }
+                }
+            }
+        }
+
+        private List<Tuple<int, int>> FindCrossings(Color[,] InputImage, List<Tuple<int, int>> locations)
+        {
+            var crossings = new List<Tuple<int, int>>();
+            for (int i = 0; i < locations.Count; i++)
+            {
+                for (int j = i + 1; j < locations.Count; j++)
+                {
+                    int xMid = InputImage.GetLength(0) / 2;
+                    int yMid = InputImage.GetLength(1) / 2;
+                    double rMax = Math.Sqrt((xMid * xMid) + (yMid * yMid));
+
+                    var point1 = new Tuple<int, int>(locations[i].Item1, locations[i].Item2);
+                    double radians1 = point1.Item1 / 256d * Math.PI;
+                    double length1 = ((256d / 2d) - point1.Item2) / 256d * rMax * 2d;
+
+                    double aanliggend1 = Math.Cos(radians1) * length1;
+                    double overstaand1 = Math.Sqrt(length1 * length1 - aanliggend1 * aanliggend1) * (length1 < 0 ? -1 : 1);
+                    double slope1 = aanliggend1 / overstaand1;
+                    double b1 = (yMid - overstaand1) - slope1 * aanliggend1;
+
+                    var point2 = new Tuple<int, int>(locations[j].Item1, locations[j].Item2);
+                    double radians2 = point2.Item1 / 256d * Math.PI;
+                    double length2 = ((256d / 2d) - point2.Item2) / 256d * rMax * 2d;
+
+                    double aanliggend2 = Math.Cos(radians2) * length2;
+                    double overstaand2 = Math.Sqrt(length2 * length2 - aanliggend2 * aanliggend2) * (length2 < 0 ? -1 : 1);
+                    double slope2 = aanliggend2 / overstaand2;
+                    double b2 = (yMid - overstaand2) - slope2 * aanliggend2;
+
+                    if (Math.Abs(slope1 - slope2) < 0.00001d || (double.IsInfinity(slope1) && double.IsInfinity(slope2)))
+                        continue;
+
+                    double intersectX = (b1 - b2) / (slope2 - slope1);
+                    double intersectY = intersectX * slope1 + b1;
+
+                    if (double.IsInfinity(slope1))
+                    {
+                        intersectX = length1;
+                        intersectY = intersectX * slope2 + b2;
+                    }
+                    if (double.IsInfinity(slope2))
+                    {
+                        intersectX = length2;
+                        intersectY = intersectX * slope1 + b1;
+                    }
+
+                    int roundedX = (int)intersectX;
+                    int roundedY = (int)intersectY;
+
+                    roundedX *= -1;
+                    roundedX += xMid;
+
+                    if (roundedX >= 0 && roundedX < InputImage.GetLength(0) && roundedY >= 0 && roundedY < InputImage.GetLength(1))
+                    {
+                        crossings.Add(new Tuple<int, int>(roundedX, roundedY));
+                    }
+                }
+            }
+            return crossings;
         }
 
         private static int Clamp(int value, int min, int max)

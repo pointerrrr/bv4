@@ -56,6 +56,11 @@
             this.numericUpDownThresholdEdgeDetection = new System.Windows.Forms.NumericUpDown();
             this.labelEdge = new System.Windows.Forms.Label();
             this.Neighbour = new System.Windows.Forms.CheckBox();
+            this.LineLength = new System.Windows.Forms.NumericUpDown();
+            this.LineGap = new System.Windows.Forms.NumericUpDown();
+            this.checkBoxCrossings = new System.Windows.Forms.CheckBox();
+            this.labelLineLength = new System.Windows.Forms.Label();
+            this.labelMaxLineLength = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreshold)).BeginInit();
@@ -65,6 +70,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThresholdEdgeDetection)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.LineLength)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.LineGap)).BeginInit();
             this.SuspendLayout();
             // 
             // LoadImageButton
@@ -346,11 +353,83 @@
             this.Neighbour.Text = "4 Neighbourhood";
             this.Neighbour.UseVisualStyleBackColor = true;
             // 
+            // LineLength
+            // 
+            this.LineLength.Location = new System.Drawing.Point(1173, 12);
+            this.LineLength.Maximum = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.LineLength.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.LineLength.Name = "LineLength";
+            this.LineLength.Size = new System.Drawing.Size(120, 20);
+            this.LineLength.TabIndex = 26;
+            this.LineLength.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
+            // LineGap
+            // 
+            this.LineGap.Location = new System.Drawing.Point(1407, 11);
+            this.LineGap.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.LineGap.Name = "LineGap";
+            this.LineGap.Size = new System.Drawing.Size(120, 20);
+            this.LineGap.TabIndex = 27;
+            this.LineGap.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // checkBoxCrossings
+            // 
+            this.checkBoxCrossings.AutoSize = true;
+            this.checkBoxCrossings.Location = new System.Drawing.Point(1063, 43);
+            this.checkBoxCrossings.Name = "checkBoxCrossings";
+            this.checkBoxCrossings.Size = new System.Drawing.Size(106, 17);
+            this.checkBoxCrossings.TabIndex = 28;
+            this.checkBoxCrossings.Text = "Detect Crossings";
+            this.checkBoxCrossings.UseVisualStyleBackColor = true;
+            // 
+            // labelLineLength
+            // 
+            this.labelLineLength.AutoSize = true;
+            this.labelLineLength.Location = new System.Drawing.Point(1060, 16);
+            this.labelLineLength.Name = "labelLineLength";
+            this.labelLineLength.Size = new System.Drawing.Size(107, 13);
+            this.labelLineLength.TabIndex = 29;
+            this.labelLineLength.Text = "Minimum Line Length";
+            // 
+            // labelMaxLineLength
+            // 
+            this.labelMaxLineLength.AutoSize = true;
+            this.labelMaxLineLength.Location = new System.Drawing.Point(1299, 16);
+            this.labelMaxLineLength.Name = "labelMaxLineLength";
+            this.labelMaxLineLength.Size = new System.Drawing.Size(110, 13);
+            this.labelMaxLineLength.TabIndex = 30;
+            this.labelMaxLineLength.Text = "Maximum Line Length";
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1940, 1061);
+            this.Controls.Add(this.labelMaxLineLength);
+            this.Controls.Add(this.labelLineLength);
+            this.Controls.Add(this.checkBoxCrossings);
+            this.Controls.Add(this.LineGap);
+            this.Controls.Add(this.LineLength);
             this.Controls.Add(this.Neighbour);
             this.Controls.Add(this.labelEdge);
             this.Controls.Add(this.numericUpDownThresholdEdgeDetection);
@@ -390,6 +469,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThresholdEdgeDetection)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.LineLength)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.LineGap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -425,6 +506,11 @@
         private System.Windows.Forms.NumericUpDown numericUpDownThresholdEdgeDetection;
         private System.Windows.Forms.Label labelEdge;
         private System.Windows.Forms.CheckBox Neighbour;
+        private System.Windows.Forms.NumericUpDown LineLength;
+        private System.Windows.Forms.NumericUpDown LineGap;
+        private System.Windows.Forms.CheckBox checkBoxCrossings;
+        private System.Windows.Forms.Label labelLineLength;
+        private System.Windows.Forms.Label labelMaxLineLength;
     }
 }
 
