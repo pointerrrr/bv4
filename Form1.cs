@@ -34,6 +34,7 @@ namespace INFOIBV
             InitializeComponent();
             comboBoxTask.SelectedIndex = 0;
             // objects
+            detect = new List<detectableObject>();
             // Name, circ, comp, minx, maxx, miny, maxy, xcent, ycent
             detect.Add(new detectableObject("Black Bishop", 0.312677663130293, 0.0248820978408043, 42,108,14,110,32,58));
             detect.Add(new detectableObject("Black, King", 0.167852866585501, 0.0133573067146134,21,132,16,111,55,55));
@@ -200,6 +201,7 @@ namespace INFOIBV
                             if (detectObejcts.sameObject(region.Value))
                             {
                                 // Put draw code here
+                                DrawBoundingBox(Image, region.Value.Min, region.Value.Max, Color.Red);
                             }
                         }
                     }
