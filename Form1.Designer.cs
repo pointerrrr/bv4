@@ -335,7 +335,7 @@
             this.numericUpDownThresholdEdgeDetection.Size = new System.Drawing.Size(120, 20);
             this.numericUpDownThresholdEdgeDetection.TabIndex = 23;
             this.numericUpDownThresholdEdgeDetection.Value = new decimal(new int[] {
-            20,
+            40,
             0,
             0,
             0});
@@ -352,6 +352,8 @@
             // Neighbour
             // 
             this.Neighbour.AutoSize = true;
+            this.Neighbour.Checked = true;
+            this.Neighbour.CheckState = System.Windows.Forms.CheckState.Checked;
             this.Neighbour.Location = new System.Drawing.Point(234, 44);
             this.Neighbour.Name = "Neighbour";
             this.Neighbour.Size = new System.Drawing.Size(108, 17);

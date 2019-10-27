@@ -207,8 +207,20 @@ namespace INFOIBV
                         {
                             if (detectObejcts.sameObject(region.Value))
                             {
-                                // Put draw code here
-                                DrawBoundingBox(Image, region.Value.Min, region.Value.Max, Color.Red, detectObejcts.name);
+                                var color = detectObejcts.color;
+                                long R = 0, G = 0, B = 0;
+                                foreach(var pixel in region.Value.Pixels)
+                                {
+                                    R += Image[pixel.X, pixel.Y].R;
+                                }
+
+                                R /= region.Value.Pixels.Count;
+
+                                if((R <= 128 && color == Color.Black) || (R > 128 && color == Color.White))
+                                {
+                                    // Put draw code here
+                                    DrawBoundingBox(Image, region.Value.Min, region.Value.Max, Color.Red, detectObejcts.name);
+                                }                                
                             }
                         }
                     }
@@ -1491,7 +1503,7 @@ namespace INFOIBV
             Bitmap temp = new Bitmap(Image.GetLength(0), Image.GetLength(1));
             for(int x = 0; x < Image.GetLength(0); x++)
             {
-                for(int y = 0; y < Image.GetLength(0); y++)
+                for(int y = 0; y < Image.GetLength(1); y++)
                 {
                     temp.SetPixel(x, y, Image[x, y]);
                 }
@@ -1511,7 +1523,7 @@ namespace INFOIBV
             //Convert to image array
             for (int x = 0; x < Image.GetLength(0); x++)
             {
-                for (int y = 0; y < Image.GetLength(0); y++)
+                for (int y = 0; y < Image.GetLength(1); y++)
                 {
                     Image[x,y] = temp.GetPixel(x,y);
                 }
@@ -1585,9 +1597,20 @@ namespace INFOIBV
     {
         public string name;
         double Circularity, Compactness, ratio, xCentroid, yCentroid;
+        public Color color;
 
         public detectableObject(string name, double Circle, double Compact, double minX, double maxX, double minY, double maxY, double xCentroid, double yCentroid)
         {
+            var colorName = new string( name.TakeWhile(x => x != ' ').ToArray());
+            switch (colorName)
+            {
+                case "White":
+                    color = Color.White;
+                    break;
+                default:
+                    color = Color.Black;
+                    break;
+            }
             this.name = name;
             this.Circularity = Circle;
             this.Compactness = Compact;
