@@ -17,6 +17,8 @@ namespace INFOIBV
 
         private int maxR = 255, maxG = 255, maxB = 255, minR = 0, minG = 0, minB = 0;
 
+        List<detectableObject> detect;
+
         // Prewitt operators ///////////////////////////////////////////////////////
         readonly double[,] prewittXKernel = new double[,] { { -1, 0, 1 }, { -1, 0, 1 }, { -1, 0, 1 } };
         readonly double[,] prewittYKernel = new double[,] { { -1, -1, -1 }, { 0, 0, 0 }, { 1, 1, 1 } };
@@ -29,6 +31,7 @@ namespace INFOIBV
         {
             InitializeComponent();
             comboBoxTask.SelectedIndex = 0;
+            // objects
         }
 
         private void LoadImageButton_Click(object sender, EventArgs e)
@@ -144,14 +147,38 @@ namespace INFOIBV
                     var areaInfos = GetAreas(areas);
 
                     var newDict = new Dictionary<int, AreaInfo>();
+                    int max = 0;
+                    int? id = null;
 
                     foreach(var info in areaInfos)
                     {
                         if (info.Value.Area > 100)
+                        {
                             newDict.Add(info.Key, info.Value);
+                            if (info.Value.Area > max && info.Key != 1)
+                            {
+                                id = info.Key;
+                                max = info.Value.Area;
+                            }
+                        }
+
                     }
-                    
-                    goto case 6;
+                    if(id != null)
+                    {
+                        string text = "\n";
+                        text += "CX: " + newDict[(int)id].CentroidX.ToString() + "\n";
+                        text += "CY: " + newDict[(int)id].CentroidY.ToString() + "\n";
+                        text += "Circ: " + newDict[(int)id].Circularity.ToString() + "\n";
+                        text += "Comp: " + newDict[(int)id].Compactness.ToString() + "\n";
+                        text += "MAXX: " + newDict[(int)id].Max.X.ToString() + "\n";
+                        text += "MAXY: " + newDict[(int)id].Max.Y.ToString() + "\n";
+                        text += "MINX: " + newDict[(int)id].Min.X.ToString() + "\n";
+                        text += "MINY: " + newDict[(int)id].Min.X.ToString() + "\n";
+                        File.AppendAllText("file.txt", text);
+                    }
+                    //Image = drawDict(Image, newDict);
+                     break;
+                    //goto case 6;
                 case 8:
                     //edge sharpening
                     double[,] kernel2 = CreateGaussianKernel(3, (double)2);
@@ -167,6 +194,30 @@ namespace INFOIBV
             print(Image, pictureBox2, label2, "Output Image");
             progressBar.Visible = false;
         }
+
+        //private Color[,] drawDict(Color[,] image, Dictionary<int, AreaInfo> newDict)
+        //{
+        //    Color[,] res = new Color[image.GetLength(0), image.GetLength(1)];
+        //    Random rnd = new Random(1337);
+        //    Color[] colors = new Color[maxRegions];
+        //    for (int i = 0; i < maxRegions; i++)
+        //    {
+        //        colors[i] = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+        //    }
+        //    for (int y = 0; y < image.GetLength(1); y++)
+        //    {
+        //        for (int x = 0; x < image.GetLength(0); x++)
+        //        {
+        //            if (regions[x, y] != 0)
+        //            {
+        //                res[x, y] = colors[regions[x, y] - 1];
+        //            }
+        //            else
+        //                res[x, y] = Color.White;
+        //        }
+        //    }
+        //    return res;
+        //}
 
         private Dictionary<int,AreaInfo> GetAreas(int[,] regions)
         {
@@ -201,7 +252,7 @@ namespace INFOIBV
                         {
                             for(int y = -1; y < 2; y++)
                             {
-                                if ((i == -1 || i == 1) && j != 0 && Neighbour.Checked || (i == 0 && j == 0))
+                                if ((x == -1 || x == 1) && y != 0 && Neighbour.Checked || (x == 0 && y == 0))
                                     continue;
                                 int absX = i + x;
                                 int absY = j + y;
@@ -338,7 +389,9 @@ namespace INFOIBV
                 for (int x = 0; x < image.GetLength(0); x++)
                 {
                     if (regions[x, y] != 0)
+                    {
                         res[x, y] = colors[regions[x, y] - 1];
+                    }
                     else
                         res[x, y] = Color.White;
                 }
@@ -1461,7 +1514,7 @@ namespace INFOIBV
             {
                 if (centroidY == null)
                     centroidY = (int)(Pixels.Select(p => p.Y - Min.Y).Sum() * (1d / Area));
-                return (int)centroidX;
+                return (int)centroidY;
             }
         }
 
@@ -1473,6 +1526,41 @@ namespace INFOIBV
             Perimeter = perimeter;
             Pixels = pixels;
         }
+    }
+
+    public class detectableObject
+    {
+        String name;
+        double Circularity, Compactness, ratio, xCentroid, yCentroid;
+
+        public detectableObject(double Circle, double Compact, double ratio, double xCentroid, double yCentroid)
+        {
+            this.Circularity = Circle;
+            this.Compactness = Compact;
+            this.ratio = ratio;
+            this.xCentroid = xCentroid;
+            this.yCentroid = yCentroid;
+        }
+
+        public bool sameObject(AreaInfo input)
+        {
+            double areaCircularity = input.Circularity;
+            double areaCompactness = input.Compactness;
+
+            double areaRatio = (input.Max.X-input.Min.X)/(input.Max.Y-input.Min.Y);
+            if (areaRatio < 1)
+                areaRatio = 1d / areaRatio;
+            double areaXCentroid = input.CentroidX / (input.Max.X - input.Min.X);
+            double areaYCentroid = input.CentroidY/ (input.Max.Y - input.Min.Y);
+
+            double error = 0.03d;
+            //Check if same object?
+            if ((Math.Abs(areaCircularity - this.Circularity) < error) && (Math.Abs(areaCompactness - this.Compactness) < error) && (Math.Abs(areaRatio - ratio) < error) && (Math.Abs(areaXCentroid - xCentroid) < error) && (Math.Abs(areaYCentroid - yCentroid) < error))
+                return true;
+
+            return false;
+        }
+
     }
 
     public class ExactColor
