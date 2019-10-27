@@ -142,6 +142,14 @@ namespace INFOIBV
                     // Object Detection
                     var areas = PreProcessing();
                     var areaInfos = GetAreas(areas);
+
+                    var newDict = new Dictionary<int, AreaInfo>();
+
+                    foreach(var info in areaInfos)
+                    {
+                        if (info.Value.Area > 100)
+                            newDict.Add(info.Key, info.Value);
+                    }
                     
                     goto case 6;
                 case 8:
@@ -1428,7 +1436,7 @@ namespace INFOIBV
         {
             get
             {
-                return Area / (Perimeter * Perimeter);
+                return Area / (double)(Perimeter * Perimeter);
             }
         }
 
@@ -1436,7 +1444,7 @@ namespace INFOIBV
         {
             get
             {
-                return 4 * Math.PI * (Area / (Perimeter * Perimeter));
+                return 4 * Math.PI * (Area / (double)( Perimeter * Perimeter));
             }
         }
         public int CentroidX {
