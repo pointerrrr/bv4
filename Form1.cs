@@ -38,7 +38,7 @@ namespace INFOIBV
             detect = new List<detectableObject>();
             // Name, circ, comp, minx, maxx, miny, maxy, xcent, ycent
             detect.Add(new detectableObject("Black Bishop", 0.312677663130293, 0.0248820978408043, 42,108,14,110,32,58));
-            detect.Add(new detectableObject("Black, King", 0.167852866585501, 0.0133573067146134,21,132,16,111,55,55));
+            detect.Add(new detectableObject("Black King", 0.167852866585501, 0.0133573067146134,21,132,16,111,55,55));
             detect.Add(new detectableObject("Black Knight", 0.323951697817155, 0.0257792570153061, 26,117,17,112,51,51));
             detect.Add(new detectableObject("Black Pawn", 0.457033024869481, 0.0363695325321096, 39,109,37,131,36,55));
             detect.Add(new detectableObject("Black Queen", 0.204730110883918, 0.0162919045734637, 19, 118,19,111, 51,53));
