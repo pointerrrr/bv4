@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Drawing.Drawing2D;
 
 namespace INFOIBV
 {
@@ -19,7 +20,7 @@ namespace INFOIBV
 
         List<detectableObject> detect;
 
-        bool testing = false;
+        bool testing = true;
 
         // Prewitt operators ///////////////////////////////////////////////////////
         readonly double[,] prewittXKernel = new double[,] { { -1, 0, 1 }, { -1, 0, 1 }, { -1, 0, 1 } };
@@ -101,20 +102,26 @@ namespace INFOIBV
                 var binaryImage = ApplyThresholding(Image, (int)numericUpDownThreshold.Value);
                 var binaryImage2 = InvertBinary(binaryImage);
                 print(binaryImage2, pictureBox3, label3, "Binary Iamge:");
+                //Generate edgeImage
                 var edgeImage = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
                 print(edgeImage, pictureBox4, label4, "Edge detection:");
+                //Create gaussian blur for edgesharpening
                 double[,] kernel3 = CreateGaussianKernel(3, (double)2);
-                var zooi2 = ApplyLinearFilter(edgeImage, kernel3);
-                var edgeImage7 = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
-                print(edgeImage7, pictureBox5, label5, "Edge Sharpening");
-                var edgeImage2 = ApplyThresholding(edgeImage7, (int)numericUpDownThresholdEdgeDetection.Value);
-                var edgeImage3 = InvertImage(edgeImage2);
+                var gaussian = ApplyLinearFilter(edgeImage, kernel3);
+                var sharpenedEdge = ApplyEdgeSharpening(edgeImage, gaussian, (double)3);
+                print(sharpenedEdge, pictureBox5, label5, "Edge Sharpening");
+                //Threshold sharpened edge image
+                var thresholdedEdge = ApplyThresholding(sharpenedEdge, (int)numericUpDownThresholdEdgeDetection.Value);
+                var edgeImage3 = InvertImage(thresholdedEdge);
+                //Opening
                 var kernel = CreateStructure(kernelDimensionSize, 3, true);
-                var edgeImage4 = Erode(edgeImage3, kernel);
-                var edgeImage5 = Dilate(edgeImage4, kernel);
-                var edgeImage6 = ApplyThresholding(edgeImage5, (int)numericUpDownThreshold.Value);
-                print(edgeImage6, pictureBox6, label6, "Thresholded Edge");
-                var regions = RegionDetection(binaryImage2, edgeImage6);                
+                var erodedImage = Erode(edgeImage3, kernel);
+                var openedImage = Dilate(erodedImage, kernel);
+                //Threshold opened image
+                var thresholdedOpen = ApplyThresholding(openedImage, (int)numericUpDownThreshold.Value);
+                print(thresholdedOpen, pictureBox6, label6, "Thresholded Edge");
+                //Detect regions with the binary image and opened edge image
+                var regions = RegionDetection(binaryImage2, thresholdedOpen);                
                 return regions;
             };
 
@@ -201,7 +208,7 @@ namespace INFOIBV
                             if (detectObejcts.sameObject(region.Value))
                             {
                                 // Put draw code here
-                                DrawBoundingBox(Image, region.Value.Min, region.Value.Max, Color.Red);
+                                DrawBoundingBox(Image, region.Value.Min, region.Value.Max, Color.Red, detectObejcts.name);
                             }
                         }
                     }
@@ -406,12 +413,14 @@ namespace INFOIBV
         private Color[,] DrawRegions(Color[,] image, int[,] regions)
         {
             Color[,] res = new Color[image.GetLength(0), image.GetLength(1)];
+            //Generate for every possible region a random collor with a seed
             Random rnd = new Random(1337);
             Color[] colors = new Color[maxRegions];
             for (int i = 0; i < maxRegions; i++)
             {
                 colors[i] = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
             }
+            //Apply color to region
             for (int y = 0; y < image.GetLength(1); y++)
             {
                 for (int x = 0; x < image.GetLength(0); x++)
@@ -427,6 +436,7 @@ namespace INFOIBV
             return res;
         }
 
+        //Invert color/grayscale image
         private Color[,] InvertImage(Color[,] InputImage)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
@@ -442,6 +452,7 @@ namespace INFOIBV
             return res;
         }
 
+        //Invert binary image
         private Color[,] InvertBinary(Color[,] Input)
         {
             var res = new Color[Input.GetLength(0), Input.GetLength(1)];
@@ -460,6 +471,7 @@ namespace INFOIBV
             return res;
         }
 
+        //Apply threshold
         private Color[,] ApplyThresholding(Color[,] InputImage, int threshholdValue, int mt = 0)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
@@ -484,11 +496,13 @@ namespace INFOIBV
             return res;
         }
 
+        //Generate histogram
         private int[] ContrastHistogram(Color[,] InputImage)
         {
             var res = new int[256];
             float qLow = 0.05f, qHigh = 0.05f;
             int[] histoR = new int[256], histoG = new int[256], histoB = new int[256];
+            //Count pixel values
             for (int x = 0; x < InputImage.GetLength(0); x++)
             {
                 for (int y = 0; y < InputImage.GetLength(1); y++)
@@ -570,6 +584,7 @@ namespace INFOIBV
             return res;
         }
 
+        //Adjust contrast of image
         private Color[,] ContrastAdjustment(Color[,] InputImage, int mt = 0)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
@@ -639,6 +654,7 @@ namespace INFOIBV
                 for (int y = fromY; y < toY; y++)
                 {
                     double redX = 0, greenX = 0, blueX = 0, redY = 0, greenY = 0, blueY = 0;
+                    //Look at neighbours if there are differances in color
                     for (int i = 0; i < xKernel.GetLength(0); i++)
                     {
                         for (int j = 0; j < xKernel.GetLength(1); j++)
@@ -697,6 +713,7 @@ namespace INFOIBV
             return res;
         }
 
+        //Create structures for filters
         public int?[,] CreateStructure(int size, int? value = 3, bool plus = false, bool grayscale = true)
         {
             var result = new int?[size, size];
@@ -735,7 +752,7 @@ namespace INFOIBV
             return result;
         }
 
-
+        // Dilate the image with the given structure
         public Color[,] Dilate(Color[,] InputImage, int?[,] kernel, bool grayscale = true, int mt = 0)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
@@ -811,6 +828,7 @@ namespace INFOIBV
             return res;
         }
 
+        // Erode image with given structure
         public Color[,] Erode(Color[,] InputImage, int?[,] kernel, bool grayscale = true, int mt = 0)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
@@ -908,21 +926,22 @@ namespace INFOIBV
                     {
                         for (int j = -1; j < 1; j++)
                         {
+                            //Check if user want 4 neighbor space or 8
                             if (((i == -1 || i == 1) && j != 0) && Neighbour.Checked)
                                 continue;
                             if (x + i >= 0 && x + i < BinaryImage.GetLength(0) && y + j >= 0 && y + j < BinaryImage.GetLength(1))
                             {
                                 if (res[x + i, y + j] != 0)
                                 {
+                                    //No other neighbours detected yet
                                     if (hasNeighbor == 0)
                                         hasNeighbor = res[x + i, y + j];
+                                    //Collision detected
                                     else if (hasNeighbor != res[x + i, y + j])
                                     {
-                                        // Do something res[x + i, y + j] < hasNeighbor 
-                                        // Colision
                                         int test1 = res[x + i, y + j];
                                         int test2 = hasNeighbor;
-
+                                        //We want the lowest possible region number
                                         if (res[x + i, y + j] < hasNeighbor)
                                         {
                                             if (collisions[hasNeighbor] > res[x + i, y + j] || collisions[hasNeighbor] == -1)
@@ -940,7 +959,7 @@ namespace INFOIBV
                             }
                         }
                     }
-
+                    //No adjacent region detected --> creating new region 
                     if (hasNeighbor == 0)
                     {
                         res[x, y] = counter;
@@ -948,11 +967,12 @@ namespace INFOIBV
                         counter++;
                         maxRegions++;
                     }
+                    //adopt region of neighbour
                     else
                         res[x, y] = hasNeighbor;
                 }
             }
-
+            // Traverse dictionary with the collisions to solve them
             for (int y = 0; y < BinaryImage.GetLength(1); y++)
             {
                 for (int x = 0; x < BinaryImage.GetLength(0); x++)
@@ -970,45 +990,9 @@ namespace INFOIBV
             }
 
             return res;
-
-            // In case of desperation:
-
-            //bool change = true;
-            //while(change)
-            //{
-            //    change = false;
-            //    for (int y = 0; y < BinaryImage.GetLength(0); y++)
-            //    {
-            //        for (int x = 0; x < BinaryImage.GetLength(1); x++)
-            //        {
-            //            if(res[x,y] != 0)
-            //            {
-            //                int low = res[x, y];
-            //                for (int i = -1; i < 2; i++)
-            //                {
-            //                    for (int j = -1; j < 2; j++)
-            //                    {
-            //                        if (x + i >= 0 && x + i < BinaryImage.GetLength(0) && y + j >= 0 && y + j < BinaryImage.GetLength(1))
-            //                        {
-            //                            if (res[x + i, y + j] < low && res[x + i, y + j] != 0)
-            //                                low = res[x + i, y + j];
-            //                        }
-            //                    }
-            //                }
-
-            //                if(low != res[x, y])
-            //                {
-            //                    res[x, y] = low;
-            //                    change = true;
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
-            return res;
         }
 
+        //Hough transform for line detection
         private int[,] houghTransform(Color[,] InputImage)
         {
             int xMid = InputImage.GetLength(0) / 2;
@@ -1064,6 +1048,7 @@ namespace INFOIBV
             return accumulatorArray;
         }
 
+        // Looking for local maxima
         private int[,] HoughThreshold(int[,] accumulatorArray)
         {
             int nAng = (int)numericUpDownnAng.Value;
@@ -1124,6 +1109,7 @@ namespace INFOIBV
             return temp;
         }
 
+        //Detect lines
         private Color[,] HoughLineDetection(int[,] accumulatorArray, Color[,] InputImage)
         {
             var res = new Color[InputImage.GetLength(0), InputImage.GetLength(1)];
@@ -1166,7 +1152,7 @@ namespace INFOIBV
                 //if (double.IsInfinity(b1))
                 //    b1 = aanliggend;
 
-                var lines = HoughLineDetection(InputImage, new Point(point.Item1, point.Item2), intensityThreshold, (int)LineLength.Value, (int)LineGap.Value);
+                var lines = lineMatching(InputImage, new Point(point.Item1, point.Item2), intensityThreshold, (int)LineLength.Value, (int)LineGap.Value);
 
                 if (Math.Abs(slope1) >= 1d)
                 {
@@ -1227,7 +1213,7 @@ namespace INFOIBV
             return res;
         }
 
-        private List<Tuple<Point, Point>> HoughLineDetection(Color[,] InputImage, Point rTheta, int minimumThreshold, int minLength, int maxGap)
+        private List<Tuple<Point, Point>> lineMatching(Color[,] InputImage, Point rTheta, int minimumThreshold, int minLength, int maxGap)
         {
             double nAng = (double)numericUpDownnAng.Value;
             double nRad = (double)numericUpDownnRad.Value;
@@ -1268,7 +1254,6 @@ namespace INFOIBV
                                 curGap = 0;
                             }
                             curLength++;
-                            //curLength += curGap;
                             curGap = 0;
                         }
                         else
@@ -1277,7 +1262,6 @@ namespace INFOIBV
                             curLength++;
                             if (curGap > maxGap)
                             {
-                                // TODO: lijnsegment controleren
                                 if (curLength - curGap >= minLength)
                                 {
 
@@ -1321,7 +1305,6 @@ namespace INFOIBV
                                 curGap = 0;
                             }
                             curLength++;
-                            //curLength += curGap;
                             curGap = 0;
                         }
                         else
@@ -1330,7 +1313,6 @@ namespace INFOIBV
                             curLength++;
                             if (curGap > maxGap)
                             {
-                                // TODO: lijnsegment controleren
                                 if (curLength - curGap >= minLength)
                                 {
                                     int oldY = (int)(slope1 * (xMid - j - curGap) + b1);
@@ -1374,6 +1356,8 @@ namespace INFOIBV
             return true;
 
         }
+
+        //Draw circle
         private void DrawCircle(Color[,] image, int X, int Y, Color color, int r)
         {
             for (int i = 0; i < 2 * r + 1; i++)
@@ -1493,7 +1477,7 @@ namespace INFOIBV
             return res;
         }
 
-        private void DrawBoundingBox(Color[,] Image, Point p1, Point p2, Color color, int thickness = 3)
+        private void DrawBoundingBox(Color[,] Image, Point p1, Point p2, Color color, String text,int thickness = 3)
         {
             for(int i = p1.X; i < p2.X; i++)
             {
@@ -1503,38 +1487,35 @@ namespace INFOIBV
                         Image[i, j] = color;
                 }
             }
-        }
-        
-        private void DrawName(Bitmap Image, string text, Point p1, Color color)
-        {
-            var g = Graphics.FromImage(Image);
-            g.DrawString(text, new Font("Tahoma", 10), new SolidBrush(color), p1);
-        }
-
-        private Bitmap ConvertToBitmap(Color[,] image)
-        {
-            var res = new Bitmap(image.GetLength(0), image.GetLength(1));
-            for (int i = 0; i < res.Size.Width; i++)
+            //Convert to bitmap
+            Bitmap temp = new Bitmap(Image.GetLength(0), Image.GetLength(1));
+            for(int x = 0; x < Image.GetLength(0); x++)
             {
-                for (int j = 0; j < res.Size.Height; j++)
+                for(int y = 0; y < Image.GetLength(0); y++)
                 {
-                    res.SetPixel(i, j, image[i, j]);
+                    temp.SetPixel(x, y, Image[x, y]);
                 }
             }
-            return res;
-        }
 
-        private Color[,] ConvertToColor(Bitmap image)
-        {
-            var res = new Color[image.Size.Width, image.Size.Height];
-            for (int i = 0; i < res.GetLength(0); i++)
+            //Write text on bitmap
+            RectangleF rectF = new RectangleF(p1.X , p1.Y - 15, 60 ,15);
+            Graphics g = Graphics.FromImage(temp);
+
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            g.DrawString(text, new Font("Tahoma", 8), Brushes.Black, rectF);
+
+            g.Flush();
+
+            //Convert to image array
+            for (int x = 0; x < Image.GetLength(0); x++)
             {
-                for (int j = 0; j < res.GetLength(1); j++)
+                for (int y = 0; y < Image.GetLength(0); y++)
                 {
-                    res[i, j] = image.GetPixel(i, j);
+                    Image[x,y] = temp.GetPixel(x,y);
                 }
             }
-            return res;
         }
     }
 
@@ -1602,17 +1583,17 @@ namespace INFOIBV
 
     public class detectableObject
     {
-        string name;
+        public string name;
         double Circularity, Compactness, ratio, xCentroid, yCentroid;
 
-        public detectableObject(string name, double Circle, double Compact, int minX, int maxX, int minY, int maxY, double xCentroid, double yCentroid)
+        public detectableObject(string name, double Circle, double Compact, double minX, double maxX, double minY, double maxY, double xCentroid, double yCentroid)
         {
             this.name = name;
             this.Circularity = Circle;
             this.Compactness = Compact;
-            double temp = (maxX - minX) / (maxY - minY);
+            double temp = ((maxX - minX) / (maxY - minY));
             if (temp < 1)
-                temp = 1 / temp;
+                temp = 1d / temp;
             this.ratio = temp;
             this.xCentroid = xCentroid / (double)(maxX - minX);
             this.yCentroid = yCentroid / (double)(maxY - minY);
@@ -1623,15 +1604,29 @@ namespace INFOIBV
             double areaCircularity = input.Circularity;
             double areaCompactness = input.Compactness;
 
-            double areaRatio = (input.Max.X-input.Min.X)/(input.Max.Y-input.Min.Y);
+            double areaRatio = (double)(input.Max.X-input.Min.X)/(double)(input.Max.Y-input.Min.Y);
             if (areaRatio < 1)
                 areaRatio = 1d / areaRatio;
             double areaXCentroid = input.CentroidX / (double)(input.Max.X - input.Min.X);
             double areaYCentroid = input.CentroidY/ (double)(input.Max.Y - input.Min.Y);
 
-            double error = 0.03d;
+
+            //Check if there are 4 properties that are within the error margin
+            double error = 0.05d;
+            int minCorrect = 4;
+            int counter = 0;
             //Check if same object?
-            if ((Math.Abs(areaCircularity - this.Circularity) < error) && (Math.Abs(areaCompactness - this.Compactness) < error) && (Math.Abs(areaRatio - ratio) < error) && (Math.Abs(areaXCentroid - xCentroid) < error) && (Math.Abs(areaYCentroid - yCentroid) < error))
+            if (Math.Abs(areaCircularity - this.Circularity) < error)
+                counter++;
+            if (Math.Abs(areaCompactness - this.Compactness) < error)
+                counter++;
+            if (Math.Abs(areaRatio - ratio) < error)
+                counter++;
+            if (Math.Abs(areaXCentroid - xCentroid) < error)
+                counter++;
+            if (Math.Abs(areaYCentroid - yCentroid) < error)
+                counter++;
+            if (counter >= minCorrect)
                 return true;
 
             return false;
