@@ -19,6 +19,8 @@ namespace INFOIBV
 
         List<detectableObject> detect;
 
+        bool testing = false;
+
         // Prewitt operators ///////////////////////////////////////////////////////
         readonly double[,] prewittXKernel = new double[,] { { -1, 0, 1 }, { -1, 0, 1 }, { -1, 0, 1 } };
         readonly double[,] prewittYKernel = new double[,] { { -1, -1, -1 }, { 0, 0, 0 }, { 1, 1, 1 } };
@@ -177,7 +179,7 @@ namespace INFOIBV
                         }
 
                     }
-                    if(id != null)
+                    if(testing && id != null)
                     {
                         string text = "\n";
                         text += "CX: " + newDict[(int)id].CentroidX.ToString() + "\n";
@@ -189,6 +191,17 @@ namespace INFOIBV
                         text += "MINX: " + newDict[(int)id].Min.X.ToString() + "\n";
                         text += "MINY: " + newDict[(int)id].Min.Y.ToString() + "\n";
                         File.AppendAllText("file.txt", text);
+                    }
+
+                    foreach(var region in newDict)
+                    {
+                        foreach(var detectObejcts in detect)
+                        {
+                            if (detectObejcts.sameObject(region.Value))
+                            {
+                                // Put draw code here
+                            }
+                        }
                     }
                     //Image = drawDict(Image, newDict);
                      break;
