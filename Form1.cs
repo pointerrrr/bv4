@@ -1614,7 +1614,7 @@ namespace INFOIBV
             this.name = name;
             this.Circularity = Circle;
             this.Compactness = Compact;
-            double temp = ((maxX - minX) / (maxY - minY));
+            double temp = ((double)(maxX - minX) / (double)(maxY - minY));
             if (temp < 1)
                 temp = 1d / temp;
             this.ratio = temp;
@@ -1635,8 +1635,8 @@ namespace INFOIBV
 
 
             //Check if there are 4 properties that are within the error margin
-            double error = 0.05d;
-            int minCorrect = 4;
+            double error = 0.03d;
+            int minCorrect = 3;
             int counter = 0;
             //Check if same object?
             if (Math.Abs(areaCircularity - this.Circularity) < error)
