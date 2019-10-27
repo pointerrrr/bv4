@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Created by Mike Knoop (5853915) and Gideon Ogilvie (5936373) for Beeldverwerking assignment 4
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
