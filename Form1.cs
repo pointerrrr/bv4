@@ -1636,7 +1636,7 @@ namespace INFOIBV
 
             //Check if there are 4 properties that are within the error margin
             double error = 0.03d;
-            int minCorrect = 3;
+            int minCorrect = 4;
             int counter = 0;
             //Check if same object?
             if (Math.Abs(areaCircularity - this.Circularity) < error)
