@@ -19,6 +19,8 @@ namespace INFOIBV
 
         List<detectableObject> detect;
 
+        bool testing = false;
+
         // Prewitt operators ///////////////////////////////////////////////////////
         readonly double[,] prewittXKernel = new double[,] { { -1, 0, 1 }, { -1, 0, 1 }, { -1, 0, 1 } };
         readonly double[,] prewittYKernel = new double[,] { { -1, -1, -1 }, { 0, 0, 0 }, { 1, 1, 1 } };
@@ -32,6 +34,20 @@ namespace INFOIBV
             InitializeComponent();
             comboBoxTask.SelectedIndex = 0;
             // objects
+            // Name, circ, comp, minx, maxx, miny, maxy, xcent, ycent
+            detect.Add(new detectableObject("Black Bishop", 0.312677663130293, 0.0248820978408043, 42,108,14,110,32,58));
+            detect.Add(new detectableObject("Black, King", 0.167852866585501, 0.0133573067146134,21,132,16,111,55,55));
+            detect.Add(new detectableObject("Black Knight", 0.323951697817155, 0.0257792570153061, 26,117,17,112,51,51));
+            detect.Add(new detectableObject("Black Pawn", 0.457033024869481, 0.0363695325321096, 39,109,37,131,36,55));
+            detect.Add(new detectableObject("Black Queen", 0.204730110883918, 0.0162919045734637, 19, 118,19,111, 51,53));
+            detect.Add(new detectableObject("Black Rook", 0.309525416194934, 0.02463125, 43,110,28,111,34,42));
+            detect.Add(new detectableObject("White Bishop", 0.35716795294963, 0.0284225226129736, 42,105,17,106,30,57));
+            detect.Add(new detectableObject("White King", 0.216380934007251, 0.0172190476190476, 21,128,16,107,53,54));
+            detect.Add(new detectableObject("White Knight", 0.381254840382737, 0.0303392962123121, 27, 114, 20, 107, 49, 48));
+            detect.Add(new detectableObject("White Pawn", 0.424927831042904, 0.033814682383898, 40, 109, 38,130, 34,55));
+            detect.Add(new detectableObject("White Queen", 0.242698144912516, 0.01931330472103, 21,114,20,107,50,51));
+            detect.Add(new detectableObject("White Rook", 0.744154982340814, 0.0592179719330014, 48, 101, 63, 107, 26, 22));
+
         }
 
         private void LoadImageButton_Click(object sender, EventArgs e)
@@ -163,7 +179,7 @@ namespace INFOIBV
                         }
 
                     }
-                    if(id != null)
+                    if(testing && id != null)
                     {
                         string text = "\n";
                         text += "CX: " + newDict[(int)id].CentroidX.ToString() + "\n";
@@ -173,8 +189,19 @@ namespace INFOIBV
                         text += "MAXX: " + newDict[(int)id].Max.X.ToString() + "\n";
                         text += "MAXY: " + newDict[(int)id].Max.Y.ToString() + "\n";
                         text += "MINX: " + newDict[(int)id].Min.X.ToString() + "\n";
-                        text += "MINY: " + newDict[(int)id].Min.X.ToString() + "\n";
+                        text += "MINY: " + newDict[(int)id].Min.Y.ToString() + "\n";
                         File.AppendAllText("file.txt", text);
+                    }
+
+                    foreach(var region in newDict)
+                    {
+                        foreach(var detectObejcts in detect)
+                        {
+                            if (detectObejcts.sameObject(region.Value))
+                            {
+                                // Put draw code here
+                            }
+                        }
                     }
                     //Image = drawDict(Image, newDict);
                      break;
@@ -1573,16 +1600,20 @@ namespace INFOIBV
 
     public class detectableObject
     {
-        String name;
+        string name;
         double Circularity, Compactness, ratio, xCentroid, yCentroid;
 
-        public detectableObject(double Circle, double Compact, double ratio, double xCentroid, double yCentroid)
+        public detectableObject(string name, double Circle, double Compact, int minX, int maxX, int minY, int maxY, double xCentroid, double yCentroid)
         {
+            this.name = name;
             this.Circularity = Circle;
             this.Compactness = Compact;
-            this.ratio = ratio;
-            this.xCentroid = xCentroid;
-            this.yCentroid = yCentroid;
+            double temp = (maxX - minX) / (maxY - minY);
+            if (temp < 1)
+                temp = 1 / temp;
+            this.ratio = temp;
+            this.xCentroid = xCentroid / (double)(maxX - minX);
+            this.yCentroid = yCentroid / (double)(maxY - minY);
         }
 
         public bool sameObject(AreaInfo input)
@@ -1593,8 +1624,8 @@ namespace INFOIBV
             double areaRatio = (input.Max.X-input.Min.X)/(input.Max.Y-input.Min.Y);
             if (areaRatio < 1)
                 areaRatio = 1d / areaRatio;
-            double areaXCentroid = input.CentroidX / (input.Max.X - input.Min.X);
-            double areaYCentroid = input.CentroidY/ (input.Max.Y - input.Min.Y);
+            double areaXCentroid = input.CentroidX / (double)(input.Max.X - input.Min.X);
+            double areaYCentroid = input.CentroidY/ (double)(input.Max.Y - input.Min.Y);
 
             double error = 0.03d;
             //Check if same object?
