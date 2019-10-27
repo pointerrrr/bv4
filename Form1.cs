@@ -69,8 +69,35 @@ namespace INFOIBV
                     Image[x, y] = InputImage.GetPixel(x, y);                // Set pixel color in array at (x,y)
                 }
             }
+
+            
+
             var histo = ContrastHistogram(Image);
             int kernelDimensionSize = 3;
+
+            Func<int[,]> PreProcessing = () =>
+            {
+                //Image = ContrastAdjustment(Image);
+                var binaryImage = ApplyThresholding(Image, (int)numericUpDownThreshold.Value);
+                var binaryImage2 = InvertBinary(binaryImage);
+                print(binaryImage2, pictureBox3, label3, "Binary Iamge:");
+                var edgeImage = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
+                print(edgeImage, pictureBox4, label4, "Edge detection:");
+                double[,] kernel3 = CreateGaussianKernel(3, (double)2);
+                var zooi2 = ApplyLinearFilter(edgeImage, kernel3);
+                var edgeImage7 = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
+                print(edgeImage7, pictureBox5, label5, "Edge Sharpening");
+                var edgeImage2 = ApplyThresholding(edgeImage7, (int)numericUpDownThresholdEdgeDetection.Value);
+                var edgeImage3 = InvertImage(edgeImage2);
+                var kernel = CreateStructure(kernelDimensionSize, 3, true);
+                var edgeImage4 = Erode(edgeImage3, kernel);
+                var edgeImage5 = Dilate(edgeImage4, kernel);
+                var edgeImage6 = ApplyThresholding(edgeImage5, (int)numericUpDownThreshold.Value);
+                print(edgeImage6, pictureBox6, label6, "Thresholded Edge");
+                var regions = RegionDetection(binaryImage2, edgeImage6);                
+                return regions;
+            };
+
             switch (comboBoxTask.SelectedIndex)
             {
                 case 0:
@@ -108,31 +135,15 @@ namespace INFOIBV
                     break;
                 case 6:
                     // Region Detection
-                    //Image = ContrastAdjustment(Image);
-                    var binaryImage = ApplyThresholding(Image, (int)numericUpDownThreshold.Value);
-                    var binaryImage2 = InvertBinary(binaryImage);
-                    print(binaryImage2, pictureBox3, label3, "Binary Iamge:");
-                    var edgeImage = ApplyEdgeDetection(Image, prewittXKernel, prewittYKernel, prewittScalar);
-                    print(edgeImage, pictureBox4, label4, "Edge detection:");
-                    double[,] kernel3 = CreateGaussianKernel(3, (double)2);
-                    var zooi2 = ApplyLinearFilter(edgeImage, kernel3);
-                    var edgeImage7 = ApplyEdgeSharpening(edgeImage, zooi2, (double)3);
-                    print(edgeImage7, pictureBox5, label5, "Edge Sharpening");
-                    var edgeImage2 = ApplyThresholding(edgeImage7, (int)numericUpDownThresholdEdgeDetection.Value);
-                    var edgeImage3 = InvertImage(edgeImage2);
-                    kernel = CreateStructure(kernelDimensionSize, 3, true);
-                    var edgeImage4 = Erode(edgeImage3, kernel);
-                    var edgeImage5 = Dilate(edgeImage4, kernel);
-                    var edgeImage6 = ApplyThresholding(edgeImage5, (int)numericUpDownThreshold.Value);
-                    print(edgeImage6, pictureBox6, label6, "Thresholded Edge");
-                    var regions = RegionDetection(binaryImage2, edgeImage6);
-                    var areaInfos = GetAreas(regions);
+                    var regions = PreProcessing();
                     Image = DrawRegions(Image, regions);
                     break;
                 case 7:
                     // Object Detection
-
-                    break;
+                    var areas = PreProcessing();
+                    var areaInfos = GetAreas(areas);
+                    
+                    goto case 6;
                 case 8:
                     //edge sharpening
                     double[,] kernel2 = CreateGaussianKernel(3, (double)2);
@@ -175,14 +186,27 @@ namespace INFOIBV
                             curArea.Min.Y = j;
                         if (j > curArea.Max.Y)
                             curArea.Max.Y = j;
-                        
+
+                        bool perimiter = false;
+
                         for(int x = -1; x < 2; x++)
                         {
-                            for(int y = -1; y < 2; j++)
+                            for(int y = -1; y < 2; y++)
                             {
-                                
+                                if ((i == -1 || i == 1) && j != 0 && Neighbour.Checked || (i == 0 && j == 0))
+                                    continue;
+                                int absX = i + x;
+                                int absY = j + y;
+                                if (absX < 0 || absX >= regions.GetLength(0) || absY < 0 || absY >= regions.GetLength(1))
+                                {
+                                    perimiter = true;
+                                    continue;
+                                }
+                                perimiter |= regions[absX, absY] != currentRegion;
                             }
                         }
+                        if (perimiter)
+                            curArea.Perimeter++;
                     }
                     else
                     {
