@@ -126,7 +126,8 @@ namespace INFOIBV
                     var edgeImage6 = ApplyThresholding(edgeImage5, (int)numericUpDownThreshold.Value);
                     print(edgeImage6, pictureBox6, label6, "Thresholded Edge");
                     var regions = RegionDetection(binaryImage2, edgeImage6);
-                    DrawRegions(Image, regions);
+                    var areaInfos = GetAreas(regions);
+                    Image = DrawRegions(Image, regions);
                     break;
                 case 7:
                     // Object Detection
@@ -146,6 +147,51 @@ namespace INFOIBV
             }
             print(Image, pictureBox2, label2, "Output Image");
             progressBar.Visible = false;
+        }
+
+        private Dictionary<int,AreaInfo> GetAreas(int[,] regions)
+        {
+            var res = new Dictionary<int,AreaInfo>();
+
+
+
+            for(int i = 0; i < regions.GetLength(0); i++)
+            {
+                for(int j = 0; j < regions.GetLength(1); j++)
+                {
+                    int currentRegion = regions[i, j];
+                    if (currentRegion == 0)
+                        continue;
+
+                    if(res.ContainsKey(currentRegion))
+                    {
+                        var curArea = res[currentRegion];
+                        curArea.Pixels.Add(new Point(i, j));
+                        if (i < curArea.Min.X)
+                            curArea.Min.X = i;
+                        if (i > curArea.Max.X)
+                            curArea.Max.X = i;
+                        if (j < curArea.Min.Y)
+                            curArea.Min.Y = j;
+                        if (j > curArea.Max.Y)
+                            curArea.Max.Y = j;
+                        
+                        for(int x = -1; x < 2; x++)
+                        {
+                            for(int y = -1; y < 2; j++)
+                            {
+                                
+                            }
+                        }
+                    }
+                    else
+                    {
+                        res.Add(currentRegion, new AreaInfo(currentRegion, new Point(i,j), new Point(i,j), 1, new List<Point> { new Point(i, j) }));
+                    }
+                }
+            }
+
+            return res;
         }
 
         void print(Color[,] Input, PictureBox output, Label textLabel, String text)
@@ -246,8 +292,9 @@ namespace INFOIBV
             return kernel;
         }
 
-        private void DrawRegions(Color[,] image, int[,] regions)
+        private Color[,] DrawRegions(Color[,] image, int[,] regions)
         {
+            Color[,] res = new Color[image.GetLength(0), image.GetLength(1)];
             Random rnd = new Random(1337);
             Color[] colors = new Color[maxRegions];
             for (int i = 0; i < maxRegions; i++)
@@ -259,11 +306,12 @@ namespace INFOIBV
                 for (int x = 0; x < image.GetLength(0); x++)
                 {
                     if (regions[x, y] != 0)
-                        image[x, y] = colors[regions[x, y] - 1];
+                        res[x, y] = colors[regions[x, y] - 1];
                     else
-                        image[x, y] = Color.White;
+                        res[x, y] = Color.White;
                 }
             }
+            return res;
         }
 
         private Color[,] InvertImage(Color[,] InputImage)
@@ -1234,6 +1282,8 @@ namespace INFOIBV
 
         private List<Tuple<int, int>> FindCrossings(Color[,] InputImage, List<Tuple<int, int>> locations)
         {
+            double nAng = (double)numericUpDownnAng.Value;
+            double nRad = (double)numericUpDownnRad.Value;
             var crossings = new List<Tuple<int, int>>();
             for (int i = 0; i < locations.Count; i++)
             {
@@ -1244,8 +1294,8 @@ namespace INFOIBV
                     double rMax = Math.Sqrt((xMid * xMid) + (yMid * yMid));
 
                     var point1 = new Tuple<int, int>(locations[i].Item1, locations[i].Item2);
-                    double radians1 = point1.Item1 / 256d * Math.PI;
-                    double length1 = ((256d / 2d) - point1.Item2) / 256d * rMax * 2d;
+                    double radians1 = point1.Item1 / nRad * Math.PI;
+                    double length1 = ((nAng / 2d) - point1.Item2) / nAng * rMax * 2d;
 
                     double aanliggend1 = Math.Cos(radians1) * length1;
                     double overstaand1 = Math.Sqrt(length1 * length1 - aanliggend1 * aanliggend1) * (length1 < 0 ? -1 : 1);
@@ -1253,8 +1303,8 @@ namespace INFOIBV
                     double b1 = (yMid - overstaand1) - slope1 * aanliggend1;
 
                     var point2 = new Tuple<int, int>(locations[j].Item1, locations[j].Item2);
-                    double radians2 = point2.Item1 / 256d * Math.PI;
-                    double length2 = ((256d / 2d) - point2.Item2) / 256d * rMax * 2d;
+                    double radians2 = point2.Item1 / nRad * Math.PI;
+                    double length2 = ((nAng / 2d) - point2.Item2) / nAng * rMax * 2d;
 
                     double aanliggend2 = Math.Cos(radians2) * length2;
                     double overstaand2 = Math.Sqrt(length2 * length2 - aanliggend2 * aanliggend2) * (length2 < 0 ? -1 : 1);
@@ -1330,6 +1380,69 @@ namespace INFOIBV
             return res;
         }
     }
+
+    public class AreaInfo
+    {
+        public int AreaNumber;
+        public Point Min, Max;
+        
+        public int Perimeter;
+        public List<Point> Pixels;
+
+        private int? centroidX;
+        private int? centroidY;
+
+        public int Area
+        {
+            get
+            {
+                return Pixels.Count;
+            }
+        }
+
+        public double Compactness
+        {
+            get
+            {
+                return Area / (Perimeter * Perimeter);
+            }
+        }
+
+        public double Circularity
+        {
+            get
+            {
+                return 4 * Math.PI * (Area / (Perimeter * Perimeter));
+            }
+        }
+        public int CentroidX {
+            get
+            {
+                if (centroidX == null)
+                    centroidX = (int)(Pixels.Select(p => p.X - Min.X).Sum() * (1d / Area));
+                return (int)centroidX;
+            }
+        }
+        public int CentroidY
+        {
+            get
+            {
+                if (centroidY == null)
+                    centroidY = (int)(Pixels.Select(p => p.Y - Min.Y).Sum() * (1d / Area));
+                return (int)centroidX;
+            }
+        }
+
+        public AreaInfo(int areaNumber, Point min, Point max, int perimeter, List<Point> pixels)
+        {
+            AreaNumber = areaNumber;
+            Min = min;
+            Max = max;
+            Perimeter = perimeter;
+            Pixels = pixels;
+        }
+    }
+
     public class ExactColor
     {
         public double R, G, B;
