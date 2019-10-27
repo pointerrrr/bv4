@@ -210,7 +210,7 @@ namespace INFOIBV
                                     perimiter = true;
                                     continue;
                                 }
-                                perimiter |= regions[absX, absY] != currentRegion;
+                                perimiter |= regions[absX, absY] == 0;
                             }
                         }
                         if (perimiter)
