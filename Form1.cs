@@ -225,9 +225,7 @@ namespace INFOIBV
                             }
                         }
                     }
-                    //Image = drawDict(Image, newDict);
                      break;
-                    //goto case 6;
                 case 8:
                     //edge sharpening
                     double[,] kernel2 = CreateGaussianKernel(3, (double)2);
@@ -243,31 +241,7 @@ namespace INFOIBV
             print(Image, pictureBox2, label2, "Output Image");
             progressBar.Visible = false;
         }
-
-        //private Color[,] drawDict(Color[,] image, Dictionary<int, AreaInfo> newDict)
-        //{
-        //    Color[,] res = new Color[image.GetLength(0), image.GetLength(1)];
-        //    Random rnd = new Random(1337);
-        //    Color[] colors = new Color[maxRegions];
-        //    for (int i = 0; i < maxRegions; i++)
-        //    {
-        //        colors[i] = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-        //    }
-        //    for (int y = 0; y < image.GetLength(1); y++)
-        //    {
-        //        for (int x = 0; x < image.GetLength(0); x++)
-        //        {
-        //            if (regions[x, y] != 0)
-        //            {
-        //                res[x, y] = colors[regions[x, y] - 1];
-        //            }
-        //            else
-        //                res[x, y] = Color.White;
-        //        }
-        //    }
-        //    return res;
-        //}
-
+        
         private Dictionary<int,AreaInfo> GetAreas(int[,] regions)
         {
             var res = new Dictionary<int,AreaInfo>();
@@ -365,8 +339,6 @@ namespace INFOIBV
             int fromY = (int)(mt / sqr) * InputImage.GetLength(1) / sqr;
             int toY = ((int)(mt / sqr) + 1) * InputImage.GetLength(1) / sqr;
 
-            //==========================================================================================
-            // example: create a negative image
             for (int x = fromX; x < toX; x++)
             {
                 for (int y = fromY; y < toY; y++)
@@ -1046,18 +1018,6 @@ namespace INFOIBV
                     }
                 }
             }
-            /*
-            Image = new Color[nAng, nRad];
-            for (int x = 0; x < nAng; x++)
-            {
-                for (int y = 0; y < nRad; y++)
-                {
-                    int intensity = (int)((accumulatorArray[x, y] / (double)max) * 255d);
-                    Image[x, y] = Color.FromArgb(intensity, intensity, intensity);
-                }
-            }*/
-
-
             return accumulatorArray;
         }
 
@@ -1111,11 +1071,10 @@ namespace INFOIBV
                 {
                     int value = (int)(temp[x, y] / (double)max * 255d);
                     if (value >= threshold)
-                        ;//Image[x, y] = Color.FromArgb(value, value, value);
+                        ;
                     else
                     {
                         temp[x, y] = 0;
-                        //Image[x, y] = Color.Black;
                     }
                 }
             }
@@ -1162,9 +1121,7 @@ namespace INFOIBV
                 double slope2 = overstaand / aanliggend;
                 double b1 = (yMid - overstaand) - slope1 * aanliggend;
                 double b2 = (xMid - aanliggend) - (slope2) * overstaand;
-                //if (double.IsInfinity(b1))
-                //    b1 = aanliggend;
-
+                
                 var lines = lineMatching(InputImage, new Point(point.Item1, point.Item2), intensityThreshold, (int)LineLength.Value, (int)LineGap.Value);
 
                 if (Math.Abs(slope1) >= 1d)
