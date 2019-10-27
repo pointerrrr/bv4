@@ -300,7 +300,6 @@ namespace INFOIBV
             pictureBox1.Image = (Image)InputImage;
         }
 
-
         private void SaveButton_Click(object sender, EventArgs e)
         {
             if (OutputImage == null) return;                                // Get out if no output image
@@ -1460,6 +1459,50 @@ namespace INFOIBV
                     int newB = Clamp((int)(((1 + scalar) * normalB) - (scalar * blurB)), 0, 255);
 
                     res[x, y] = Color.FromArgb(newR, newG, newB);
+                }
+            }
+            return res;
+        }
+
+        private void DrawBoundingBox(Color[,] Image, Point p1, Point p2, Color color, int thickness = 3)
+        {
+            for(int i = p1.X; i < p2.X; i++)
+            {
+                for(int j = p1.Y; j < p2.Y; j++)
+                {
+                    if (Math.Abs(p1.X - i) < thickness ||  Math.Abs(p1.Y - j) < thickness || Math.Abs(p2.X - i) <= thickness || Math.Abs(p2.Y - j) <= thickness)
+                        Image[i, j] = color;
+                }
+            }
+        }
+        
+        private void DrawName(Bitmap Image, string text, Point p1, Color color)
+        {
+            var g = Graphics.FromImage(Image);
+            g.DrawString(text, new Font("Tahoma", 10), new SolidBrush(color), p1);
+        }
+
+        private Bitmap ConvertToBitmap(Color[,] image)
+        {
+            var res = new Bitmap(image.GetLength(0), image.GetLength(1));
+            for (int i = 0; i < res.Size.Width; i++)
+            {
+                for (int j = 0; j < res.Size.Height; j++)
+                {
+                    res.SetPixel(i, j, image[i, j]);
+                }
+            }
+            return res;
+        }
+
+        private Color[,] ConvertToColor(Bitmap image)
+        {
+            var res = new Color[image.Size.Width, image.Size.Height];
+            for (int i = 0; i < res.GetLength(0); i++)
+            {
+                for (int j = 0; j < res.GetLength(1); j++)
+                {
+                    res[i, j] = image.GetPixel(i, j);
                 }
             }
             return res;
